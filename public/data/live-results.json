@@ -1,0 +1,10 @@
+{
+  "scrapedAt": null,
+  "source": "clippd",
+  "teams": {},
+  "meta": {
+    "teamCount": 0,
+    "successCount": 0,
+    "note": "Placeholder. Populated by scripts/scrape-clippd.mjs (daily GitHub Action)."
+  }
+}
