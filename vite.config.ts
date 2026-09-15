@@ -120,7 +120,6 @@ function authPopupPlugin(): Plugin {
   };
 }
 
-/** Resolve tslib package root for post-compile copy into the serverless function. */
 function tslibPackageRoot(): string | null {
   try {
     return dirname(require.resolve("tslib/package.json"));
@@ -149,14 +148,9 @@ export default defineConfig({
   },
   resolve: {
     tsconfigPaths: true,
-    // Force Vite/Rollup to the ESM build of tslib when bundling.
-    alias: {
-      tslib: "tslib/tslib.es6.mjs",
-    },
   },
   ssr: {
-    // Bundle UI libs into the SSR graph instead of leaving bare imports.
-    noExternal: ["tslib", /@radix-ui\//, "class-variance-authority", "cmdk", "vaul"],
+    noExternal: ["tslib", /@radix-ui\//, "class-variance-authority", "cmdk", "vaul", "react-remove-scroll"],
   },
   plugins: [
     pgliteBootstrapPlugin(),
@@ -165,18 +159,11 @@ export default defineConfig({
     grokPwaPlugin(),
     tailwindcss(),
     tanstackStart(),
-    // Official TanStack Start + Vercel pattern: nitro() with no forced preset.
-    // On Vercel CI, Nitro auto-selects the vercel preset.
+    // Official TanStack Start + Vercel: nitro auto-selects vercel preset on Vercel.
     nitro({
       serverDir: "./server",
-      // Prefer bundling over runtime node_modules resolution for UI deps.
-      noExternals: ["tslib", /@radix-ui\//],
-      alias: {
-        tslib: "tslib/tslib.es6.mjs",
-      },
+      noExternals: ["tslib", /@radix-ui\//, "react-remove-scroll"],
       hooks: {
-        // After the server is compiled, guarantee tslib exists where Node
-        // resolves packages for /_libs/*.mjs (parent node_modules of the func).
         compiled(nitro: {
           options: { output: { dir: string; serverDir: string } };
         }) {
@@ -187,8 +174,6 @@ export default defineConfig({
           }
           const outDir = nitro.options.output.dir;
           const serverDir = nitro.options.output.serverDir;
-          // Vercel: .vercel/output/functions/__server.func
-          // Also cover generic .output/server
           const candidates = [
             serverDir,
             join(outDir, "functions", "__server.func"),
