@@ -1,5 +1,6 @@
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, cpSync, existsSync, mkdirSync } from "node:fs";
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -12,7 +13,8 @@ import { grokPwaPlugin } from "./scripts/grok-pwa-plugin.mjs";
 import { appEnvPlugin } from "./scripts/app-env-plugin.mjs";
 import { isMigrationFile } from "./scripts/migration-plan.mjs";
 
-/** The files `src/lib/db.ts` globs — same directory, same non-recursive scope. */
+const require = createRequire(import.meta.url);
+
 function hasGlobbedMigrations(root: string): boolean {
   try {
     return readdirSync(join(root, "migrations")).some(isMigrationFile);
@@ -67,7 +69,9 @@ function authPopupPlugin(): Plugin {
           );
           const proto = String(
             req.headers["x-forwarded-proto"] ??
-              ((req.socket as { encrypted?: boolean } | undefined)?.encrypted ? "https" : "http"),
+              ((req.socket as { encrypted?: boolean } | undefined)?.encrypted
+                ? "https"
+                : "http"),
           );
           const requestHeaders = new Headers();
           for (const [key, value] of Object.entries(req.headers)) {
@@ -102,8 +106,7 @@ function authPopupPlugin(): Plugin {
           for (const cookie of setCookies) {
             res.appendHeader("set-cookie", cookie);
           }
-          const body = Buffer.from(await response.arrayBuffer());
-          res.end(body);
+          res.end(Buffer.from(await response.arrayBuffer()));
         } catch (err) {
           console.error("[app-builder] /auth/popup handler failed:", err);
           if (!res.headersSent) {
@@ -117,7 +120,23 @@ function authPopupPlugin(): Plugin {
   };
 }
 
-export default defineConfig(({ command, isPreview }) => ({
+/** Resolve tslib package root for post-compile copy into the serverless function. */
+function tslibPackageRoot(): string | null {
+  try {
+    return dirname(require.resolve("tslib/package.json"));
+  } catch {
+    return null;
+  }
+}
+
+function copyTslibInto(dir: string, src: string) {
+  const dest = join(dir, "node_modules", "tslib");
+  mkdirSync(dirname(dest), { recursive: true });
+  cpSync(src, dest, { recursive: true });
+  console.log("[nitro] copied tslib →", dest);
+}
+
+export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 8080,
@@ -128,10 +147,15 @@ export default defineConfig(({ command, isPreview }) => ({
     port: 8081,
     strictPort: true,
   },
-  resolve: { tsconfigPaths: true },
-  // Bundle these into the SSR graph so Nitro does not leave bare
-  // `import "tslib"` in /_libs chunks that Vercel cannot resolve.
+  resolve: {
+    tsconfigPaths: true,
+    // Force Vite/Rollup to the ESM build of tslib when bundling.
+    alias: {
+      tslib: "tslib/tslib.es6.mjs",
+    },
+  },
   ssr: {
+    // Bundle UI libs into the SSR graph instead of leaving bare imports.
     noExternal: ["tslib", /@radix-ui\//, "class-variance-authority", "cmdk", "vaul"],
   },
   plugins: [
@@ -141,20 +165,42 @@ export default defineConfig(({ command, isPreview }) => ({
     grokPwaPlugin(),
     tailwindcss(),
     tanstackStart(),
-    ...(command === "build" || isPreview
-      ? [
-          nitro({
-            preset: "vercel",
-            serverDir: "./server",
-            // Keep tslib + Radix inside the server bundle (not node_modules externals).
-            externals: {
-              inline: ["tslib", /@radix-ui\//, "class-variance-authority", "cmdk", "vaul"],
-            },
-            // Ensure node-file-trace still ships tslib if anything remains external.
-            moduleSideEffects: ["tslib"],
-          }),
-        ]
-      : []),
+    // Official TanStack Start + Vercel pattern: nitro() with no forced preset.
+    // On Vercel CI, Nitro auto-selects the vercel preset.
+    nitro({
+      serverDir: "./server",
+      // Prefer bundling over runtime node_modules resolution for UI deps.
+      noExternals: ["tslib", /@radix-ui\//],
+      alias: {
+        tslib: "tslib/tslib.es6.mjs",
+      },
+      hooks: {
+        // After the server is compiled, guarantee tslib exists where Node
+        // resolves packages for /_libs/*.mjs (parent node_modules of the func).
+        compiled(nitro: {
+          options: { output: { dir: string; serverDir: string } };
+        }) {
+          const src = tslibPackageRoot();
+          if (!src) {
+            console.warn("[nitro] tslib not found in node_modules");
+            return;
+          }
+          const outDir = nitro.options.output.dir;
+          const serverDir = nitro.options.output.serverDir;
+          // Vercel: .vercel/output/functions/__server.func
+          // Also cover generic .output/server
+          const candidates = [
+            serverDir,
+            join(outDir, "functions", "__server.func"),
+            join(outDir, "server"),
+            outDir,
+          ];
+          for (const dir of candidates) {
+            if (dir && existsSync(dir)) copyTslibInto(dir, src);
+          }
+        },
+      },
+    }),
     viteReact(),
   ],
-}));
+});

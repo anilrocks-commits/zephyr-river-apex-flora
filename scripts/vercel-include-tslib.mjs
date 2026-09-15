@@ -1,45 +1,67 @@
 #!/usr/bin/env node
 /**
- * After `vite build` (Nitro vercel preset), copy `tslib` into every serverless
- * function directory so bare `import "tslib"` from /_libs chunks resolve.
+ * Safety net after vite build: put tslib where Node resolves bare imports
+ * from /_libs/*.mjs inside the Vercel function.
  */
 import { cpSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+const require = createRequire(import.meta.url);
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const tslibSrc = join(root, "node_modules", "tslib");
-const vercelOut = join(root, ".vercel", "output", "functions");
 
-if (!existsSync(tslibSrc)) {
-  console.warn("[vercel-include-tslib] node_modules/tslib missing — skip");
+let tslibSrc;
+try {
+  tslibSrc = dirname(require.resolve("tslib/package.json"));
+} catch {
+  console.warn("[vercel-include-tslib] tslib not installed — skip");
   process.exit(0);
 }
 
-if (!existsSync(vercelOut)) {
-  // Local builds without vercel output are fine
-  console.log("[vercel-include-tslib] no .vercel/output/functions — skip");
-  process.exit(0);
-}
-
-function walkFuncs(dir, out = []) {
+function walk(dir, match, out = []) {
+  if (!existsSync(dir)) return out;
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
-    if (!statSync(p).isDirectory()) continue;
-    if (name.endsWith(".func")) out.push(p);
-    else walkFuncs(p, out);
+    let st;
+    try {
+      st = statSync(p);
+    } catch {
+      continue;
+    }
+    if (!st.isDirectory()) continue;
+    if (match(name, p)) out.push(p);
+    // Do not descend into node_modules
+    if (name === "node_modules") continue;
+    walk(p, match, out);
   }
   return out;
 }
 
-const funcs = walkFuncs(vercelOut);
-let n = 0;
-for (const funcDir of funcs) {
-  const dest = join(funcDir, "node_modules", "tslib");
-  mkdirSync(dirname(dest), { recursive: true });
-  cpSync(tslibSrc, dest, { recursive: true });
-  n += 1;
-  console.log(`[vercel-include-tslib] copied tslib → ${dest}`);
+const searchRoots = [
+  join(root, ".vercel", "output"),
+  join(root, ".output"),
+];
+
+const funcDirs = searchRoots.flatMap((r) =>
+  walk(r, (name) => name.endsWith(".func")),
+);
+const libParents = searchRoots.flatMap((r) =>
+  walk(r, (name) => name === "_libs").map((p) => dirname(p)),
+);
+
+const targets = new Set([...funcDirs, ...libParents]);
+
+if (targets.size === 0) {
+  console.log("[vercel-include-tslib] no function/_libs output found — skip");
+  process.exit(0);
 }
 
-console.log(`[vercel-include-tslib] done (${n} function(s))`);
+for (const dir of targets) {
+  const dest = join(dir, "node_modules", "tslib");
+  mkdirSync(dirname(dest), { recursive: true });
+  cpSync(tslibSrc, dest, { recursive: true });
+  console.log("[vercel-include-tslib] copied →", dest);
+}
+
+console.log(`[vercel-include-tslib] done (${targets.size} target(s))`);
