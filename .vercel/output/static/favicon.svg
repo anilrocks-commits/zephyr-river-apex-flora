@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" role="img" aria-label="Arjun Golf">
+  <rect width="16" height="16" rx="3" fill="#0c110e"/>
+  <rect x="5" y="2" width="2" height="11" fill="#8fa894"/>
+  <path fill="#8fa894" d="M7 2v6l6-3z"/>
+</svg>

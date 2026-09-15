@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Arjun Golf",
+      "hasCanvas": false,
+      "bodyTextLen": 2285,
+      "bodyTextHash": "a8720a888f02f4b31af22b0188457474a24f96a6cb145ca488fddcbf8c9f8ee0",
+      "bodyTextPrefix": "Arjun Golf 2027 recruiting intelligence UPDATED SEP 14, 2026 Mod",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Arjun Golf",
+      "hasCanvas": false,
+      "bodyTextLen": 1863,
+      "bodyTextHash": "338e3c8b5bd8b204ca14591724fa1ec36cccbf3718c5f5ce29d6aa5b1d25e0b9",
+      "bodyTextPrefix": "Arjun Golf Model 2027 CLASS Watch list Ten programs, scored by l",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

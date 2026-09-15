@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/team/shu",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Arjun Golf",
+      "hasCanvas": false,
+      "bodyTextLen": 2675,
+      "bodyTextHash": "67dfd835bb37c0c21361a93d9f41ad6e1737e1c2ffd589b146eff9db14cd4f3c",
+      "bodyTextPrefix": "Arjun Golf 2027 recruiting intelligence UPDATED SEP 14, 2026 Mod",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/shu-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Arjun Golf",
+      "hasCanvas": false,
+      "bodyTextLen": 2231,
+      "bodyTextHash": "9f56b9d9c75edee499e00eee527aebff039853f2404cf3c7e03047889b482771",
+      "bodyTextPrefix": "Arjun Golf Model D1 · BIG EAST · Seton Hall Men's Golf Seton Hal",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/shu-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/shu-preview.json"
+}
