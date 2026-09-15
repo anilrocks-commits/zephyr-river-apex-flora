@@ -1,10 +1,178 @@
 {
-  "scrapedAt": null,
+  "scrapedAt": "2026-09-15T06:21:07.127Z",
   "source": "clippd",
-  "teams": {},
+  "teams": {
+    "siu": {
+      "id": "siu",
+      "name": "Southern Illinois",
+      "clippdId": "4127",
+      "scheduleUrl": "https://scoreboard.clippd.com/teams/4127/schedule",
+      "teamUrl": "https://scoreboard.clippd.com/teams/4127",
+      "events": [
+        {
+          "raw": "Live Streams",
+          "place": null,
+          "score": null,
+          "toPar": null,
+          "href": "https://watch.babygrandegolf.com/"
+        },
+        {
+          "raw": "Season 2026/2027",
+          "place": "2026",
+          "score": "2026",
+          "toPar": null,
+          "href": null
+        },
+        {
+          "raw": "2026 Badger Invitational",
+          "place": "2026 ",
+          "score": "2026",
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/245446"
+        }
+      ],
+      "error": null,
+      "scrapedAt": "2026-09-15T06:20:39.540Z",
+      "pageTextSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nSouthern Illinois University at Carbondale\nMen\nDivision:\nNCAA Division I\nConference:\nMissouri Valley Conference\nHead Coach:\nJustin Fetcho\nRanking\nRoster\nSchedule\nSeason 2026/2027\nApr 12 - Apr 13, 2027\nEverett Buick GMC Classic\nLittle Rock, Arkansas\nChenal CC - Little Rock - Arkansas\nNCAA Division I\nMen\nLittle Rock\nApr 5 - Apr 6, 2027\nRacer Intercollegiate\nPaducah, KY\nCC Of Paducah - Paducah - KY\nNCAA Division I\nMen\nMurray State\nMar 29 - Mar 31, 2027\nGolfweek Spring Challenge\nPawley's Island, SC\nTrue Blue GC - Pawley's Island - SC\nNCAA Division I\nMen\nGolfweek (Men)\nMar 12 - Mar 14, 2027\nSeminole Intercollegiate\nTallahassee, Florida\nSeminole Legacy GC - Tallahassee - FL\nNCAA Division I\nMen\nFlorida State\nMar 1 - Mar 2, 2027\nSam Ryder Intercollegiate\nDaytona Beach, FL\nLpga International - Daytona Beach - FL\nNCAA Division I\nMen\nStetson\nFeb 22 - Feb 24, 2027\nUniversity of Wyoming Desert Intercollegiate\nPalm Desert, California\nClassic Club - Palm Desert - California\nNCAA Division I\nMen\nWyoming\nOct 26 - Oct 28, 2026\nKa'anapali Classic\nLahaina, HI\nKaanapali GR - Lahaina - HI\nScoreboardLive\nNCAA Division I\nMen\nHawaii\nOct 12 - Oct 13, 2026\nPurdue Fall Invitational\nWest Lafayette, Indiana\nKampen-Cosler Golf Course - West Lafayette\nNCAA Division I\nMen\nPurdue\nSep 27 - Sep 29, 2026\n2026 Badger Invitational\nVerona, Wisconsin\nThe University of Wisconsin Golf Course\nNCAA Division I\nMen\nWisconsin\nSep "
+    },
+    "ksu": {
+      "id": "ksu",
+      "name": "Kennesaw State",
+      "clippdId": "4172",
+      "scheduleUrl": "https://scoreboard.clippd.com/teams/4172/schedule",
+      "teamUrl": "https://scoreboard.clippd.com/teams/4172",
+      "events": [
+        {
+          "raw": "Live Streams",
+          "place": null,
+          "score": null,
+          "toPar": null,
+          "href": "https://watch.babygrandegolf.com/"
+        },
+        {
+          "raw": "Season 2026/2027",
+          "place": "2026",
+          "score": "2026",
+          "toPar": null,
+          "href": null
+        },
+        {
+          "raw": "2027 Conference USA Men's Golf Championship - Match Play",
+          "place": "2027 ",
+          "score": "2027",
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/246487"
+        },
+        {
+          "raw": "2027 CUSA Men's Golf Championship - Stroke Play",
+          "place": "2027 ",
+          "score": "2027",
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/246484"
+        }
+      ],
+      "error": null,
+      "scrapedAt": "2026-09-15T06:20:46.387Z",
+      "pageTextSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nKennesaw State University\nMen\nDivision:\nNCAA Division I\nConference:\nConference USA\nHead Coach:\nBryant Odom\nRanking\nRoster\nSchedule\nSeason 2026/2027\nApr 29, 2027\n2027 Conference USA Men's Golf Championship - Match Play\nPearland, Texas\nGolfcrest Country Club\nNCAA Division I\nMen\nConference USA (Men)\nApr 26 - Apr 28, 2027\n2027 CUSA Men's Golf Championship - Stroke Play\nPearland, Texas\nGolfcrest Country Club\nNCAA Division I\nMen\nConference USA (Men)\nApr 10 - Apr 11, 2027\nTar Heel Intercollegiate\nChapel Hill, NC\nFinley GC - Chapel Hill - NC\nNCAA Division I\nMen\nNorth Carolina\nMar 19 - Mar 21, 2027\nLinger Longer Invitational\nEatonton, Georgia\nGreat Waters at Reynolds Lake Oconee - Eatonton - Georgia\nNCAA Division I\nMen\nKennesaw State\nMar 1 - Mar 2, 2027\nSam Ryder Intercollegiate\nDaytona Beach, FL\nLpga International - Daytona Beach - FL\nNCAA Division I\nMen\nStetson\nFeb 7 - Feb 9, 2027\nDorado Beach Collegiate\nDORADO, PR\nTpc Dorado Beach - DORADO - PR\nScoreboardLive\nNCAA Division I\nMen\nUNCG\nFeb 1 - Feb 2, 2027\nSeaBest Invitational\nAtlantic Beach, FL\nAtlantic Beach CC\nNCAA Division I\nMen\nJacksonville\nOct 31 - Nov 1, 2026\nSteelwood Collegiate\nLoxley, Alabama\nSteelwood GC - Loxley - Alabama\nNCAA Division I\nMen\nSouth Alabama\nOct 12 - Oct 13, 2026\nThe Scrappy at Pinetree\nKennesaw, Georgia\nPinetree CC - Kennesaw - Georgia\nNCAA Division I\nMen\nKennesaw State\nOct 5 - Oct 6, 2026\nCullan Brown Collegiate\nL"
+    },
+    "shu": {
+      "id": "shu",
+      "name": "Seton Hall",
+      "clippdId": "3163",
+      "scheduleUrl": "https://scoreboard.clippd.com/teams/3163/schedule",
+      "teamUrl": "https://scoreboard.clippd.com/teams/3163",
+      "events": [
+        {
+          "raw": "Live Streams",
+          "place": null,
+          "score": null,
+          "toPar": null,
+          "href": "https://watch.babygrandegolf.com/"
+        },
+        {
+          "raw": "Season 2026/2027",
+          "place": "2026",
+          "score": "2026",
+          "toPar": null,
+          "href": null
+        },
+        {
+          "raw": "2027 BIG EAST Men's Golf Championship",
+          "place": "2027 ",
+          "score": "2027",
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/246237"
+        },
+        {
+          "raw": "2027 Big East Match Play Championship",
+          "place": "2027 ",
+          "score": "2027",
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/246163"
+        },
+        {
+          "raw": "48th Macdonald Cup",
+          "place": "48th ",
+          "score": null,
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/245044"
+        },
+        {
+          "raw": "10th Alex Lagowitz Memorial",
+          "place": "10th ",
+          "score": null,
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/246006"
+        }
+      ],
+      "error": null,
+      "scrapedAt": "2026-09-15T06:20:53.089Z",
+      "pageTextSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nSeton Hall University\nMen\nDivision:\nNCAA Division I\nConference:\nBig East Conference\nHead Coach:\nJT Harper\nRanking\nRoster\nSchedule\nSeason 2026/2027\nMay 1 - May 3, 2027\n2027 BIG EAST Men's Golf Championship\nOkatie, SC\nCallawassie Island Club - Okatie - SC\nNCAA Division I\nMen\nBig East Conference (Men)\nApr 17 - Apr 18, 2027\nRutgers Invitational\nBedminster, New Jersey\nTrump National GC at Bedminster - Bedminster - New Jersey\nNCAA Division I\nMen\nRutgers\nApr 10 - Apr 11, 2027\nPrinceton Invitational\nPrinceton, NJ\nSpringdale GC - Princeton - NJ\nNCAA Division I\nMen\nPrinceton\nApr 5 - Apr 6, 2027\nWildcat Spring Invitational\nGalloway Township, New Jersey\nGalloway National GC - Galloway Township - New Jersey\nNCAA Division I\nMen\nVillanova\nMar 15 - Mar 16, 2027\nTiger Invitational\nAuburn, Alabama\nAuburn University Club - Auburn - Alabama\nNCAA Division I\nMen\nAuburn\nMar 8 - Mar 10, 2027\nBabygrande Donald Ross Collegiate\nSouthern Pines, NC\nMid Pines Club - Southern Pines - NC\nBabygrande\nNCAA Division I\nMen\nGeorge Mason\nFeb 8 - Feb 9, 2027\n2027 Big East Match Play Championship\nWest Palm Beach, FL\nBear Lakes CC - West Palm Beach - FL\nNCAA Division I\nMen\nConnecticut\nOct 12 - Oct 14, 2026\nThe Bryson Invitational\nMiami, Florida\nTrump National Doral Miami - Miami - Florida\nNCAA Division I\nMen\nCharleston\nOct 5 - Oct 6, 2026\nNemacolin Collegiate Invitational\nFarmington, Pennsylvania\nNemacolin Woodlands Resort "
+    },
+    "ucsb": {
+      "id": "ucsb",
+      "name": "UC Santa Barbara",
+      "clippdId": "2520",
+      "scheduleUrl": "https://scoreboard.clippd.com/teams/2520/schedule",
+      "teamUrl": "https://scoreboard.clippd.com/teams/2520",
+      "events": [
+        {
+          "raw": "Live Streams",
+          "place": null,
+          "score": null,
+          "toPar": null,
+          "href": "https://watch.babygrandegolf.com/"
+        },
+        {
+          "raw": "Season 2026/2027",
+          "place": "2026",
+          "score": "2026",
+          "toPar": null,
+          "href": null
+        },
+        {
+          "raw": "2027 Big West Men's Golf Championship",
+          "place": "2027 ",
+          "score": "2027",
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/246159"
+        },
+        {
+          "raw": "TMU Danish Classic 2026",
+          "place": "2026",
+          "score": "2026",
+          "toPar": null,
+          "href": "https://scoreboard.clippd.com/tournaments/244885"
+        }
+      ],
+      "error": null,
+      "scrapedAt": "2026-09-15T06:21:00.603Z",
+      "pageTextSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nUniversity of California, Santa Barbara\nMen\nDivision:\nNCAA Division I\nConference:\nBig West Conference\nHead Coach:\nChris Massoletti\nRanking\nRoster\nSchedule\nSeason 2026/2027\nMay 2 - May 4, 2027\n2027 Big West Men's Golf Championship\nLa Quinta , California\nLa Quinta Country Club\nNCAA Division I\nMen\nBig West Conference (Men)\nApr 10 - Apr 11, 2027\nAggie Invitational\nBryan, Texas\nTraditions Club at Texas A&M - Bryan - Texas\nNCAA Division I\nMen\nTexas A&M\nApr 5 - Apr 6, 2027\nUCSB Gaucho Invite\nSanta Barbara, California\nSandpiper GC - Santa Barbara - California\nNCAA Division I\nMen\nUC Santa Barbara\nMar 22 - Mar 23, 2027\nAdmired Leadership Bruin Invitational\nValencia, CA\nValencia CC - Valencia - CA\nNCAA Division I\nMen\nUCLA\nMar 8 - Mar 9, 2027\nR.E. Lamkin Invitational\nSan Diego, CA\nThe Grand GC - San Diego - CA\nNCAA Division I\nMen\nSan Diego\nMar 1 - Mar 2, 2027\nThe Watney Invitational\nFresno, CA\nSunnyside CC - Fresno - CA\nNCAA Division I\nMen\nFresno State\nFeb 22 - Feb 24, 2027\nUniversity of Wyoming Desert Intercollegiate\nPalm Desert, California\nClassic Club - Palm Desert - California\nNCAA Division I\nMen\nWyoming\nOct 12 - Oct 14, 2026\nVisit Stockton Pacific Invitational\nStockton, California\nThe Reserve at Spanos Park - Stockton - California\nNCAA Division I\nMen\nPacific\nOct 5 - Oct 6, 2026\nTMU Danish Classic 2026\nSolvang, California\nAlisal Guest Ranch & Resort - Solvang - California\nNAIA\nMen\nMaster's\n"
+    }
+  },
   "meta": {
-    "teamCount": 0,
-    "successCount": 0,
-    "note": "Placeholder. Populated by scripts/scrape-clippd.mjs (daily GitHub Action)."
+    "teamCount": 4,
+    "successCount": 4,
+    "note": "Raw Clippd extract. Merge into programs.ts events manually or via a follow-up transform script. Insights remain human-curated."
   }
 }
