@@ -1,6 +1,5 @@
-import { readdirSync, cpSync, existsSync, mkdirSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -12,8 +11,6 @@ import { grokPwaPlugin } from "./scripts/grok-pwa-plugin.mjs";
 // @ts-expect-error JS plugin alongside the TS vite config
 import { appEnvPlugin } from "./scripts/app-env-plugin.mjs";
 import { isMigrationFile } from "./scripts/migration-plan.mjs";
-
-const require = createRequire(import.meta.url);
 
 function hasGlobbedMigrations(root: string): boolean {
   try {
@@ -120,22 +117,7 @@ function authPopupPlugin(): Plugin {
   };
 }
 
-function tslibPackageRoot(): string | null {
-  try {
-    return dirname(require.resolve("tslib/package.json"));
-  } catch {
-    return null;
-  }
-}
-
-function copyTslibInto(dir: string, src: string) {
-  const dest = join(dir, "node_modules", "tslib");
-  mkdirSync(dirname(dest), { recursive: true });
-  cpSync(src, dest, { recursive: true });
-  console.log("[nitro] copied tslib →", dest);
-}
-
-export default defineConfig({
+export default defineConfig(({ command, isPreview }) => ({
   server: {
     host: "0.0.0.0",
     port: 8080,
@@ -150,6 +132,7 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   ssr: {
+    // Keep Radix/tslib inside the SSR bundle so Vercel NFT cannot miss them.
     noExternal: ["tslib", /@radix-ui\//, "class-variance-authority", "cmdk", "vaul", "react-remove-scroll"],
   },
   plugins: [
@@ -159,33 +142,18 @@ export default defineConfig({
     grokPwaPlugin(),
     tailwindcss(),
     tanstackStart(),
-    // Official TanStack Start + Vercel: nitro auto-selects vercel preset on Vercel.
-    nitro({
-      serverDir: "./server",
-      noExternals: ["tslib", /@radix-ui\//, "react-remove-scroll"],
-      hooks: {
-        compiled(nitro: {
-          options: { output: { dir: string; serverDir: string } };
-        }) {
-          const src = tslibPackageRoot();
-          if (!src) {
-            console.warn("[nitro] tslib not found in node_modules");
-            return;
-          }
-          const outDir = nitro.options.output.dir;
-          const serverDir = nitro.options.output.serverDir;
-          const candidates = [
-            serverDir,
-            join(outDir, "functions", "__server.func"),
-            join(outDir, "server"),
-            outDir,
-          ];
-          for (const dir of candidates) {
-            if (dir && existsSync(dir)) copyTslibInto(dir, src);
-          }
-        },
-      },
-    }),
+    ...(command === "build" || isPreview
+      ? [
+          nitro({
+            preset: "vercel",
+            // Auto-registers server/middleware/* (PWA install page + manifest).
+            // Do not override `hooks.compiled` — Nitro writes config.json and
+            // .vc-config.json there; replacing that hook produces a function
+            // with no Vercel launcher config.
+            serverDir: "./server",
+          }),
+        ]
+      : []),
     viteReact(),
   ],
-});
+}));

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Ensure Vercel Build Output API v3 artifacts exist after Nitro build.
- * Without config.json, Vercel falls back to looking for "dist" / static-only.
+ * Safety net after Nitro build: only fill missing Build Output API files.
+ * Never overwrite Nitro's config.json / .vc-config.json — those are complete.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -23,18 +23,20 @@ if (!existsSync(funcDir)) {
   process.exit(1);
 }
 
-// Minimal BOA v3 config: static files first, then SSR catch-all.
-const config = {
-  version: 3,
-  framework: { name: "nitro", version: "3" },
-  routes: [
-    { handle: "filesystem" },
-    { src: "/(.*)", dest: "/__server" },
-  ],
-};
-
-writeFileSync(configPath, JSON.stringify(config, null, 2));
-console.log("[vercel-ensure-boa] wrote", configPath);
+if (!existsSync(configPath)) {
+  const config = {
+    version: 3,
+    framework: { name: "nitro", version: "3" },
+    routes: [
+      { handle: "filesystem" },
+      { src: "/(.*)", dest: "/__server" },
+    ],
+  };
+  writeFileSync(configPath, JSON.stringify(config, null, 2));
+  console.log("[vercel-ensure-boa] wrote missing", configPath);
+} else {
+  console.log("[vercel-ensure-boa] kept existing", configPath);
+}
 
 if (!existsSync(vcConfigPath)) {
   const vc = {
@@ -46,12 +48,11 @@ if (!existsSync(vcConfigPath)) {
   };
   mkdirSync(dirname(vcConfigPath), { recursive: true });
   writeFileSync(vcConfigPath, JSON.stringify(vc, null, 2));
-  console.log("[vercel-ensure-boa] wrote", vcConfigPath);
+  console.log("[vercel-ensure-boa] wrote missing", vcConfigPath);
 } else {
   console.log("[vercel-ensure-boa] kept existing", vcConfigPath);
 }
 
-// Sanity: handler entry
 const index = join(funcDir, "index.mjs");
 if (!existsSync(index)) {
   console.error("[vercel-ensure-boa] missing", index);
