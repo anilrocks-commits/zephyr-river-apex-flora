@@ -1,21 +1,18 @@
 #!/usr/bin/env node
 /**
- * Clippd college golf scraper (v4)
+ * Clippd college golf scraper (v5)
  * --------------------------------
- * 1. Load each team's schedule page (click Load more)
- * 2. Parse the full calendar (dates, venue, ScoreboardLive)
- * 3. Visit /scoring/team + /scoring/player for recent/live events
- * 4. Write public/data/live-results.json
- *
- * Clippd layout note: the tournament hub (/tournaments/{id}) is a participant
- * list. Actual leaderboards are on:
- *   /tournaments/{id}/scoring/team
- *   /tournaments/{id}/scoring/player
+ * Scores: HTTP GET with a desktop Chrome User-Agent on
+ *   /tournaments/{id}/scoring/team?displayMode=stroke
+ *   /tournaments/{id}/scoring/player?displayMode=stroke
+ * Clippd SSR's the leaderboard into the first HTML response when the UA
+ * looks like a real browser. Playwright is only used for schedule pages
+ * (Load more + tournament links) when needed.
  *
  * Usage:
  *   node scripts/scrape-clippd.mjs
- *   node scripts/scrape-clippd.mjs --headful
  *   node scripts/scrape-clippd.mjs --recent
+ *   node scripts/scrape-clippd.mjs --headful   # schedule via Playwright headed
  */
 
 import { chromium } from "playwright";
@@ -63,6 +60,35 @@ function loadPrevious() {
   } catch {
     return { teams: {}, scrapedAt: null };
   }
+}
+
+/** HTTP GET with browser-like headers (primary path for scoreboards). */
+async function httpGet(url) {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": USER_AGENT,
+      Accept: "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Cache-Control": "no-cache",
+    },
+    redirect: "follow",
+  });
+  const text = await res.text();
+  return { status: res.status, text, ok: res.ok };
+}
+
+function htmlToLines(html) {
+  let text = html.replace(/<script[\s\S]*?<\/script>/gi, " ");
+  text = text.replace(/<style[\s\S]*?<\/style>/gi, " ");
+  text = text.replace(/<[^>]+>/g, "\n");
+  return text
+    .split("\n")
+    .map((l) => l.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+function htmlToFlat(html) {
+  return htmlToLines(html).join(" ");
 }
 
 function parseRange(dates) {
@@ -218,7 +244,6 @@ function pickToVisit(schedule, links) {
   for (const s of scored) {
     if (seen.has(s.tournamentId)) continue;
     if (RECENT_ONLY && s.priority > 3) continue;
-    // Skip far-future spring championships when we already have enough near-term cards
     if (s.priority >= 9 && chosen.length >= 3) continue;
     seen.add(s.tournamentId);
     chosen.push(s);
@@ -227,169 +252,141 @@ function pickToVisit(schedule, links) {
   return chosen;
 }
 
-async function extractTournamentsFromSchedule(page) {
-  return page.evaluate(() => {
-    const byId = new Map();
-    for (const a of document.querySelectorAll('a[href*="/tournaments/"]')) {
-      const m = (a.href || "").match(/\/tournaments\/(\d+)/);
-      if (!m) continue;
-      const id = m[1];
-      const text = (a.innerText || a.textContent || "").trim();
-      if (!byId.has(id)) {
-        byId.set(id, {
-          tournamentId: id,
-          name: text || null,
-          href: `https://scoreboard.clippd.com/tournaments/${id}`,
-        });
-      } else if (text && text.length > (byId.get(id).name || "").length) {
-        byId.get(id).name = text;
-      }
-    }
-    const body = document.body?.innerText || "";
-    return {
-      tournaments: [...byId.values()],
-      pageTextSnippet: body.slice(0, 8000),
-    };
-  });
+function extractMeta(htmlOrText) {
+  const body = htmlOrText || "";
+  const flat = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  const venue =
+    flat.match(/Venue\s*:\s*([^|]+?)(?:\s+Hosted|\s+Division|\s+Scoring|$)/i)?.[1]?.trim() ||
+    body.match(/Venue:\s*\n?\s*([^\n<]+)/i)?.[1]?.trim() ||
+    null;
+  const dates =
+    flat.match(
+      /((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:\s*[-–]\s*(?:[A-Za-z]+\.?\s+)?\d{1,2})?,?\s*\d{4})/i,
+    )?.[1]?.trim() || null;
+  const title =
+    body.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.replace(/\s*[|–-].*$/, "").trim() ||
+    flat.match(/SCOREBOARD\s*-\s*([^(]+)/i)?.[1]?.trim() ||
+    null;
+  return { venue, dates, title };
 }
 
-async function clickLoadMore(page) {
-  for (let i = 0; i < 6; i += 1) {
-    const clicked = await page.evaluate(() => {
-      const nodes = [...document.querySelectorAll("button, a, div, span")];
-      const el = nodes.find((n) => /^\s*load more\s*$/i.test(n.textContent || ""));
-      if (!el) return false;
-      el.click();
-      return true;
-    });
-    if (!clicked) break;
-    await sleep(1800);
-  }
-}
+/**
+ * Parse team stroke leaderboard from SSR HTML.
+ * Example: "3 Seton Hall 846 F 283 286 277"
+ */
+function parseTeamStrokeBoard(html, focusTeam) {
+  const flat = htmlToFlat(html);
+  // place, optional movement digit, team name, total, F, r1 r2 r3
+  const pat =
+    /(T?\d+)\s+(?:\d+\s+)?([A-Za-z][A-Za-z0-9 .&'()/-]{1,40}?)\s+(\d{3,4})\s+F\s+(\d{2,3})\s+(\d{2,3})\s+(\d{2,3})(?:\s+(\d{2,3}))?/g;
 
-/** Parse team leaderboard text from /scoring/team */
-function parseTeamBoard(body, focusTeam) {
-  const lines = body.split("\n").map((l) => l.trim()).filter(Boolean);
   const teamStandings = [];
+  const seen = new Set();
+  let m;
+  while ((m = pat.exec(flat)) !== null) {
+    const team = m[2].trim();
+    if (/^(round|total|current|data|available|thru|view)/i.test(team)) continue;
+    if (team.length < 2 || team.length > 40) continue;
+    const key = team.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const rounds = [m[4], m[5], m[6], m[7]]
+      .filter(Boolean)
+      .map((n) => parseInt(n, 10));
+    teamStandings.push({
+      place: m[1],
+      team,
+      total: parseInt(m[3], 10),
+      rounds,
+      toPar: null,
+    });
+  }
 
-  // Multi-line Clippd layout often: place / team name / R1 R2 total / toPar
-  // Also single-line: "T1 Team Name 288 290 578 +10"
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
-    const single = line.match(
-      /^(T?\d+)\s+(.+?)\s+((?:\d{2,3}\s+){1,4}\d{3,4})\s*([+-]?\d+|E)?\s*$/i,
-    );
-    if (single) {
-      const rounds = single[3].trim().split(/\s+/).map((n) => parseInt(n, 10));
-      const total = rounds[rounds.length - 1];
-      const roundScores = rounds.slice(0, -1);
+  // Fallback: to-par view "3 - Seton Hall -6 F -1 +2 -7"
+  if (!teamStandings.length) {
+    const parPat =
+      /(\d+)\s*-\s*([A-Za-z][A-Za-z0-9 .&'()/-]+?)\s+([+-]?\d+|E)\s+F\s+([+-]?\d+|E)\s+([+-]?\d+|E)\s+([+-]?\d+|E)/gi;
+    while ((m = parPat.exec(flat)) !== null) {
+      const team = m[2].trim();
+      if (/round|current|data/i.test(team)) continue;
+      const key = team.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
       teamStandings.push({
-        place: single[1],
-        team: single[2].trim(),
-        rounds: roundScores,
-        total,
-        toPar: single[4] || null,
+        place: m[1],
+        team,
+        total: null,
+        rounds: [m[4], m[5], m[6]],
+        toPar: m[3],
       });
-      continue;
-    }
-
-    // Split: place on one line, team next, scores next
-    const placeOnly = line.match(/^(T?\d+)$/);
-    if (placeOnly && lines[i + 1] && lines[i + 2]) {
-      const team = lines[i + 1];
-      const scoreLine = lines[i + 2];
-      const scores = scoreLine.match(/^((?:\d{2,3}\s+){1,4}\d{3,4})\s*([+-]?\d+|E)?$/i);
-      if (scores && !/^(round|total|pos|#)/i.test(team) && team.length > 2) {
-        const rounds = scores[1].trim().split(/\s+/).map((n) => parseInt(n, 10));
-        const total = rounds[rounds.length - 1];
-        teamStandings.push({
-          place: placeOnly[1],
-          team: team.trim(),
-          rounds: rounds.slice(0, -1),
-          total,
-          toPar: scores[2] || null,
-        });
-        i += 2;
-      }
     }
   }
 
   const teamRow =
     teamStandings.find((r) => teamNameMatch(r.team, focusTeam)) || null;
-
   return { teamStandings, teamRow };
 }
 
-/** Parse player leaderboard text from /scoring/player */
-function parsePlayerBoard(body, focusTeam) {
-  const lines = body.split("\n").map((l) => l.trim()).filter(Boolean);
+/**
+ * Parse player stroke leaderboard for one school from SSR HTML.
+ * Layout (line-oriented after tag strip):
+ *   place / name / Seton Hall / total / F / r1 / r2 / r3
+ */
+function parsePlayerStrokeBoard(html, focusTeam) {
+  const lines = htmlToLines(html);
+  const nameRe = /^[A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+)+$/;
   const players = [];
-
-  // Single-line style
-  const playerRe =
-    /^([A-Za-z][A-Za-z.'\- ]+?)\s+((?:\d{2,3}\s+){1,4}\d{2,3})\s*([+-]?\d+|E)?\s*(T?\d+|WD|DQ|CUT)?\s*(IND)?\s*$/;
-
-  for (const line of lines) {
-    const pm = line.match(playerRe);
-    if (!pm) continue;
-    const name = pm[1].trim();
-    if (name.length < 4 || name.length > 40) continue;
-    if (/^(round|total|par|team|pos|thru|score|player)/i.test(name)) continue;
-    const nums = pm[2].trim().split(/\s+/).map((n) => parseInt(n, 10));
-    const total = nums[nums.length - 1];
-    if (total > 320) continue;
-    players.push({
-      name,
-      rounds: nums.slice(0, -1),
-      total,
-      toPar: pm[3] || null,
-      finish: pm[4] || null,
-      role: pm[5] ? "ind" : "team",
-      team: null,
-    });
-  }
-
-  // Table-ish multi-line: place, toPar, team, player, total, thru, RD1...
-  // Capture pairs of team-name / player-name when focus team matches
-  for (let i = 0; i < lines.length - 2; i += 1) {
-    const maybeTeam = lines[i];
-    const maybePlayer = lines[i + 1];
-    const maybeScores = lines[i + 2];
-    if (!teamNameMatch(maybeTeam, focusTeam) && focusTeam) {
-      // still collect if it looks like Name + scores without team prefix
+  let i = 0;
+  while (i < lines.length - 4) {
+    if (nameRe.test(lines[i]) && teamNameMatch(lines[i + 1], focusTeam)) {
+      const name = lines[i];
+      const teamLabel = lines[i + 1];
+      let place = null;
+      for (const back of [2, 1, 3]) {
+        if (i >= back && /^T?\d+$/.test(lines[i - back])) {
+          place = lines[i - back];
+          break;
+        }
+      }
+      const nums = [];
+      let j = i + 2;
+      while (j < lines.length && j < i + 14) {
+        const t = lines[j];
+        if (t === "F" || t === "-" || t === "E" || /^[+-]?\d+$/.test(t)) {
+          nums.push(t);
+          j += 1;
+        } else break;
+      }
+      const strokes = nums
+        .filter((x) => /^\d{2,3}$/.test(x))
+        .map((x) => parseInt(x, 10));
+      let total = null;
+      let rounds = [];
+      if (strokes.length && strokes[0] >= 150) {
+        total = strokes[0];
+        rounds = strokes.slice(1, 5);
+      } else if (strokes.length) {
+        rounds = strokes.slice(0, 4);
+        total = rounds.reduce((a, b) => a + b, 0);
+      }
+      const role = /\(IND\)/i.test(teamLabel) ? "ind" : "team";
+      players.push({
+        name,
+        team: teamLabel,
+        role,
+        finish: place,
+        total,
+        rounds,
+        toPar: null,
+      });
+      i = j;
       continue;
     }
-    if (!/^[A-Za-z]/.test(maybePlayer)) continue;
-    if (maybePlayer.length < 4 || maybePlayer.length > 40) continue;
-    // Scores as "72 71 143" or to-par column nearby
-    const scoreMatch = maybeScores.match(/^((?:\d{2,3}\s+){0,3}\d{2,3})\s*([+-]?\d+|E)?$/);
-    if (!scoreMatch) continue;
-    const nums = scoreMatch[1].trim().split(/\s+/).map((n) => parseInt(n, 10));
-    if (nums.some((n) => !Number.isFinite(n))) continue;
-    const total = nums[nums.length - 1];
-    if (total > 320 || total < 50) continue;
-    players.push({
-      name: maybePlayer,
-      rounds: nums.length > 1 ? nums.slice(0, -1) : nums,
-      total,
-      toPar: scoreMatch[2] || null,
-      finish: null,
-      role: "team",
-      team: maybeTeam,
-    });
-  }
-
-  // Prefer players tagged to our team when focus is set; otherwise keep all
-  let filtered = players;
-  if (focusTeam) {
-    const ours = players.filter(
-      (p) => !p.team || teamNameMatch(p.team, focusTeam),
-    );
-    if (ours.length >= 3) filtered = ours;
+    i += 1;
   }
 
   const seen = new Set();
-  return filtered.filter((p) => {
+  return players.filter((p) => {
     const k = p.name.toLowerCase();
     if (seen.has(k)) return false;
     seen.add(k);
@@ -397,36 +394,27 @@ function parsePlayerBoard(body, focusTeam) {
   });
 }
 
-async function readPageText(page) {
-  return page.evaluate(() => {
-    const body = document.body?.innerText || "";
-    return {
-      title: document.title || null,
-      h1: document.querySelector("h1")?.innerText?.trim() || null,
-      body,
-      bodySnippet: body.slice(0, 10000),
-    };
-  });
+function linksFromHtml(html) {
+  const byId = new Map();
+  const re = /href=["']([^"']*\/tournaments\/(\d+)[^"']*)["']/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const id = m[2];
+    if (!byId.has(id)) {
+      byId.set(id, {
+        tournamentId: id,
+        name: null,
+        href: `https://scoreboard.clippd.com/tournaments/${id}`,
+      });
+    }
+  }
+  return [...byId.values()];
 }
 
-function extractMeta(body) {
-  const venue =
-    body.match(/Venue:\s*\n?\s*([^\n]+)/i)?.[1]?.trim() ||
-    body.match(/Venue:\s*([^\n]+)/i)?.[1]?.trim() ||
-    null;
-  const dates =
-    body.match(/Dates?:\s*\n?\s*([^\n]+)/i)?.[1]?.trim() ||
-    body.match(
-      /((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:\s*[-–]\s*(?:[A-Za-z]+\.?\s+)?\d{1,2})?,\s*\d{4})/i,
-    )?.[1]?.trim() ||
-    null;
-  return { venue, dates };
-}
-
-async function scrapeTournament(page, tournamentId, teamName) {
+async function scrapeTournamentHttp(tournamentId, teamName) {
   const hubUrl = `https://scoreboard.clippd.com/tournaments/${tournamentId}`;
-  const teamUrl = `${hubUrl}/scoring/team`;
-  const playerUrl = `${hubUrl}/scoring/player`;
+  const teamUrl = `${hubUrl}/scoring/team?displayMode=stroke`;
+  const playerUrl = `${hubUrl}/scoring/player?displayMode=stroke`;
 
   const result = {
     tournamentId,
@@ -445,20 +433,25 @@ async function scrapeTournament(page, tournamentId, teamName) {
     teamStandings: [],
     error: null,
     rawSnippet: null,
+    fetchMode: "http-stroke",
   };
 
   try {
-    // 1) Team leaderboard
-    await page.goto(teamUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-    await sleep(2500);
-    const teamPage = await readPageText(page);
-    const meta = extractMeta(teamPage.body);
-    result.name = teamPage.h1 || teamPage.title || null;
+    const teamRes = await httpGet(teamUrl);
+    if (!teamRes.ok) {
+      result.error = `team board HTTP ${teamRes.status}`;
+      return result;
+    }
+    const meta = extractMeta(teamRes.text);
+    result.name = meta.title;
     result.venue = meta.venue;
     result.dates = meta.dates;
-    result.rawSnippet = teamPage.bodySnippet;
+    result.rawSnippet = htmlToFlat(teamRes.text).slice(0, 4000);
 
-    const { teamStandings, teamRow } = parseTeamBoard(teamPage.body, teamName);
+    const { teamStandings, teamRow } = parseTeamStrokeBoard(
+      teamRes.text,
+      teamName,
+    );
     result.teamStandings = teamStandings.slice(0, 40);
     if (teamRow) {
       result.teamPlace = teamRow.place;
@@ -467,60 +460,69 @@ async function scrapeTournament(page, tournamentId, teamName) {
       result.teamToPar = teamRow.toPar;
     }
 
-    // 2) Player leaderboard
-    await page.goto(playerUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-    await sleep(2500);
-    const playerPage = await readPageText(page);
-    if (!result.name) result.name = playerPage.h1 || playerPage.title || null;
-    if (!result.dates || !result.venue) {
-      const m2 = extractMeta(playerPage.body);
-      result.dates = result.dates || m2.dates;
-      result.venue = result.venue || m2.venue;
+    await sleep(400 + Math.random() * 400);
+
+    const playerRes = await httpGet(playerUrl);
+    if (playerRes.ok) {
+      const m2 = extractMeta(playerRes.text);
+      if (!result.name) result.name = m2.title;
+      if (!result.dates) result.dates = m2.dates;
+      if (!result.venue) result.venue = m2.venue;
+      result.players = parsePlayerStrokeBoard(playerRes.text, teamName).slice(
+        0,
+        40,
+      );
+      result.rawSnippet = `${result.rawSnippet || ""}\n---PLAYER---\n${htmlToFlat(playerRes.text).slice(0, 4000)}`.slice(
+        0,
+        12000,
+      );
     }
-    result.rawSnippet = `${result.rawSnippet || ""}\n---PLAYER---\n${playerPage.bodySnippet}`.slice(
-      0,
-      14000,
-    );
 
-    result.players = parsePlayerBoard(playerPage.body, teamName).slice(0, 50);
-
-    // Fallback: if team board empty, try hub once (some events only populate hub)
-    if (!result.teamStandings.length && !result.players.length) {
-      await page.goto(hubUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-      await sleep(2000);
-      const hub = await readPageText(page);
-      const hubTeams = parseTeamBoard(hub.body, teamName);
-      if (hubTeams.teamStandings.length) {
-        result.teamStandings = hubTeams.teamStandings.slice(0, 40);
-        if (hubTeams.teamRow) {
-          result.teamPlace = hubTeams.teamRow.place;
-          result.teamRounds = hubTeams.teamRow.rounds;
-          result.teamTotal = hubTeams.teamRow.total;
-          result.teamToPar = hubTeams.teamRow.toPar;
+    // Optional meta from public API (no scores)
+    try {
+      const api = await httpGet(
+        `https://scoreboard.clippd.com/api/tournaments/${tournamentId}`,
+      );
+      if (api.ok) {
+        const data = JSON.parse(api.text);
+        result.name = result.name || data.tournamentName || null;
+        result.venue = result.venue || data.venue || null;
+        if (data.startDate && data.endDate) {
+          const fmt = (iso) => {
+            const d = new Date(iso + "T12:00:00Z");
+            return d.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              timeZone: "UTC",
+            });
+          };
+          result.dates =
+            result.dates ||
+            (data.startDate === data.endDate
+              ? fmt(data.startDate)
+              : `${fmt(data.startDate)} - ${fmt(data.endDate)}`);
+        }
+        if (data.isComplete && (result.players.length || result.teamTotal != null)) {
+          result.status = "complete";
+        } else if (data.hasResults && !data.isComplete) {
+          result.status = "live";
         }
       }
-      if (!result.players.length) {
-        result.players = parsePlayerBoard(hub.body, teamName).slice(0, 50);
-      }
-      result.rawSnippet = hub.bodySnippet;
+    } catch {
+      /* optional */
     }
 
-    const snip = (result.rawSnippet || "").toLowerCase();
-    const noPlayers = /no players to show yet/.test(snip);
     const hasScores =
       result.players.length > 0 ||
       result.teamPlace ||
       result.teamTotal != null ||
       result.teamStandings.length > 0;
-
-    if (hasScores && (/\blive\b|in progress|thru\s*\d/.test(snip) || /scoreboardlive/.test(snip))) {
-      result.status = "live";
-    } else if (hasScores) {
-      result.status = "complete";
-    } else if (noPlayers) {
-      result.status = "upcoming";
-    } else {
-      result.status = "unknown";
+    if (!result.status) {
+      if (hasScores) result.status = "complete";
+      else if (/no players to show yet/i.test(result.rawSnippet || ""))
+        result.status = "upcoming";
+      else result.status = "unknown";
     }
   } catch (err) {
     result.error = String(err?.message || err);
@@ -529,86 +531,90 @@ async function scrapeTournament(page, tournamentId, teamName) {
   return result;
 }
 
-async function scrapeTeam(page, team) {
+async function scrapeScheduleHttp(team) {
   const scheduleUrl = `https://scoreboard.clippd.com/teams/${team.clippdId}/schedule`;
-  console.log(`\n→ ${team.name} (${team.clippdId})`);
-
-  const result = {
-    id: team.id,
-    name: team.name,
-    clippdId: team.clippdId,
+  const res = await httpGet(scheduleUrl);
+  if (!res.ok) return { ok: false, scheduleUrl, error: `HTTP ${res.status}` };
+  const links = linksFromHtml(res.text);
+  const lines = htmlToLines(res.text).join("\n");
+  const schedule = attachIds(parseScheduleSnippet(lines), links);
+  return {
+    ok: true,
     scheduleUrl,
-    teamUrl: `https://scoreboard.clippd.com/teams/${team.clippdId}`,
-    tournaments: [],
-    schedule: [],
-    error: null,
-    scrapedAt: new Date().toISOString(),
+    schedule,
+    links,
+    scheduleSnippet: lines.slice(0, 6000),
   };
+}
 
-  try {
-    await page.goto(scheduleUrl, {
-      waitUntil: "domcontentloaded",
-      timeout: 45000,
-    });
-    await sleep(2500);
-    await clickLoadMore(page);
-
-    const { tournaments, pageTextSnippet } = await extractTournamentsFromSchedule(page);
-    result.scheduleSnippet = pageTextSnippet?.slice(0, 6000) || null;
-    const schedule = attachIds(parseScheduleSnippet(pageTextSnippet), tournaments);
-    result.schedule = schedule;
-
-    const filtered = tournaments.filter((t) => {
-      const n = (t.name || "").toLowerCase();
-      if (!n) return true;
-      if (n.includes("live stream")) return false;
-      if (n === "season" || n.startsWith("season ")) return false;
+async function scrapeSchedulePlaywright(page, team) {
+  const scheduleUrl = `https://scoreboard.clippd.com/teams/${team.clippdId}/schedule`;
+  await page.goto(scheduleUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
+  await sleep(2000);
+  for (let i = 0; i < 6; i += 1) {
+    const clicked = await page.evaluate(() => {
+      const nodes = [...document.querySelectorAll("button, a, div, span")];
+      const el = nodes.find((n) => /^\s*load more\s*$/i.test(n.textContent || ""));
+      if (!el) return false;
+      el.click();
       return true;
     });
-
-    const toVisit = pickToVisit(schedule, filtered);
-    console.log(
-      `  schedule=${schedule.length} links=${tournaments.length} visiting=${toVisit.length}`,
-    );
-
-    for (const t of toVisit) {
-      console.log(`    · ${t.tournamentId} ${t.name || ""}`);
-      const detail = await scrapeTournament(page, t.tournamentId, team.name);
-      if (!detail.name && t.name) detail.name = t.name;
-      if (!detail.dates && t.dates) detail.dates = t.dates;
-      if (!detail.venue && t.venue) detail.venue = t.venue;
-      result.tournaments.push(detail);
-      const scored =
-        detail.teamPlace ||
-        detail.teamTotal != null ||
-        (detail.players && detail.players.length);
-      console.log(
-        `      status=${detail.status} team=${detail.teamPlace || "—"} players=${(detail.players || []).length}${scored ? " ✓" : ""}`,
-      );
-      await sleep(1500 + Math.random() * 1200);
-    }
-  } catch (err) {
-    result.error = String(err?.message || err);
-    console.error(`  ✗ ${team.name}: ${result.error}`);
+    if (!clicked) break;
+    await sleep(1500);
   }
-
-  return result;
+  const { tournaments, pageTextSnippet } = await page.evaluate(() => {
+    const byId = new Map();
+    for (const a of document.querySelectorAll('a[href*="/tournaments/"]')) {
+      const m = (a.href || "").match(/\/tournaments\/(\d+)/);
+      if (!m) continue;
+      const id = m[1];
+      const text = (a.innerText || a.textContent || "").trim();
+      if (!byId.has(id)) {
+        byId.set(id, {
+          tournamentId: id,
+          name: text || null,
+          href: `https://scoreboard.clippd.com/tournaments/${id}`,
+        });
+      } else if (text && text.length > (byId.get(id).name || "").length) {
+        byId.get(id).name = text;
+      }
+    }
+    return {
+      tournaments: [...byId.values()],
+      pageTextSnippet: (document.body?.innerText || "").slice(0, 8000),
+    };
+  });
+  const schedule = attachIds(parseScheduleSnippet(pageTextSnippet), tournaments);
+  return {
+    ok: true,
+    scheduleUrl,
+    schedule,
+    links: tournaments,
+    scheduleSnippet: pageTextSnippet?.slice(0, 6000) || null,
+  };
 }
 
 function keepBetter(prev, scraped) {
   if (!prev) return scraped;
-  const prevById = new Map((prev.tournaments || []).map((t) => [t.tournamentId, t]));
+  const prevById = new Map(
+    (prev.tournaments || []).map((t) => [t.tournamentId, t]),
+  );
   const merged = (scraped.tournaments || []).map((t) => {
     const old = prevById.get(t.tournamentId);
-    const newHas = (t.players && t.players.length) || t.teamPlace || t.teamTotal;
-    const oldHas = old && ((old.players && old.players.length) || old.teamPlace || old.teamTotal);
+    const newHas =
+      (t.players && t.players.length) || t.teamPlace || t.teamTotal != null;
+    const oldHas =
+      old &&
+      ((old.players && old.players.length) || old.teamPlace || old.teamTotal != null);
     if (!newHas && oldHas) return { ...old, lastEmptyAt: scraped.scrapedAt };
     return t;
   });
-  // Keep previous tournament pages not re-visited this run
   for (const [id, old] of prevById) {
     if (!merged.some((t) => t.tournamentId === id)) {
-      const oldHas = (old.players && old.players.length) || old.teamPlace || old.teamTotal;
+      const oldHas =
+        (old.players && old.players.length) ||
+        old.teamPlace ||
+        old.teamTotal != null;
       if (oldHas) merged.push(old);
     }
   }
@@ -620,34 +626,102 @@ function keepBetter(prev, scraped) {
   };
 }
 
+async function scrapeTeam(page, team) {
+  console.log(`\n→ ${team.name} (${team.clippdId})`);
+  const result = {
+    id: team.id,
+    name: team.name,
+    clippdId: team.clippdId,
+    scheduleUrl: `https://scoreboard.clippd.com/teams/${team.clippdId}/schedule`,
+    teamUrl: `https://scoreboard.clippd.com/teams/${team.clippdId}`,
+    tournaments: [],
+    schedule: [],
+    error: null,
+    scrapedAt: new Date().toISOString(),
+  };
+
+  try {
+    let sched = await scrapeScheduleHttp(team);
+    if ((!sched.ok || (sched.schedule?.length || 0) < 2) && page) {
+      console.log("  schedule HTTP thin — trying Playwright");
+      sched = await scrapeSchedulePlaywright(page, team);
+    }
+    if (!sched.ok) {
+      result.error = sched.error || "schedule failed";
+      return result;
+    }
+
+    result.schedule = sched.schedule || [];
+    result.scheduleSnippet = sched.scheduleSnippet || null;
+    result.scheduleUrl = sched.scheduleUrl;
+
+    const links = (sched.links || []).filter((t) => {
+      const n = (t.name || "").toLowerCase();
+      if (n.includes("live stream")) return false;
+      if (n === "season" || n.startsWith("season ")) return false;
+      return true;
+    });
+
+    const toVisit = pickToVisit(result.schedule, links);
+    console.log(
+      `  schedule=${result.schedule.length} links=${links.length} visiting=${toVisit.length}`,
+    );
+
+    for (const t of toVisit) {
+      console.log(`    · ${t.tournamentId} ${t.name || ""}`);
+      const detail = await scrapeTournamentHttp(t.tournamentId, team.name);
+      if (!detail.name && t.name) detail.name = t.name;
+      if (!detail.dates && t.dates) detail.dates = t.dates;
+      if (!detail.venue && t.venue) detail.venue = t.venue;
+      result.tournaments.push(detail);
+      const scored =
+        detail.teamPlace ||
+        detail.teamTotal != null ||
+        (detail.players && detail.players.length);
+      console.log(
+        `      status=${detail.status} place=${detail.teamPlace || "—"} total=${detail.teamTotal ?? "—"} players=${(detail.players || []).length}${scored ? " ✓" : ""}${detail.error ? " err=" + detail.error : ""}`,
+      );
+      await sleep(500 + Math.random() * 700);
+    }
+  } catch (err) {
+    result.error = String(err?.message || err);
+    console.error(`  ✗ ${team.name}: ${result.error}`);
+  }
+
+  return result;
+}
+
 async function main() {
-  console.log("Clippd scraper v4 starting…");
-  console.log(`  headful=${HEADFUL} recent=${RECENT_ONLY} teams=${TEAMS.length}`);
-  console.log("  boards: /scoring/team + /scoring/player");
+  console.log("Clippd scraper v5 starting…");
+  console.log(`  mode=http-stroke  headful=${HEADFUL} recent=${RECENT_ONLY} teams=${TEAMS.length}`);
 
   const previous = loadPrevious();
-  const browser = await chromium.launch({
-    headless: !HEADFUL,
-    args: ["--disable-blink-features=AutomationControlled"],
-  });
+  let browser = null;
+  let page = null;
 
-  const context = await browser.newContext({
-    userAgent: USER_AGENT,
-    viewport: { width: 1440, height: 900 },
-    locale: "en-US",
-  });
+  // Playwright optional — only if schedule HTTP needs help
+  try {
+    browser = await chromium.launch({
+      headless: !HEADFUL,
+      args: ["--disable-blink-features=AutomationControlled"],
+    });
+    const context = await browser.newContext({
+      userAgent: USER_AGENT,
+      viewport: { width: 1440, height: 900 },
+      locale: "en-US",
+    });
+    await context.addInitScript(() => {
+      Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+    });
+    page = await context.newPage();
+  } catch (err) {
+    console.log("  Playwright unavailable — schedule HTTP only:", err.message);
+  }
 
-  await context.addInitScript(() => {
-    Object.defineProperty(navigator, "webdriver", { get: () => undefined });
-  });
-
-  const page = await context.newPage();
   const teams = {};
-
   for (const team of TEAMS) {
     const prev = previous.teams?.[team.id] || null;
     const scraped = await scrapeTeam(page, team);
-
     if (scraped.error && prev && !prev.error) {
       console.log(`  ↺ keeping previous good data for ${team.id}`);
       teams[team.id] = {
@@ -658,28 +732,27 @@ async function main() {
     } else {
       teams[team.id] = keepBetter(prev, scraped);
     }
-
-    await sleep(2000 + Math.random() * 1500);
+    await sleep(800 + Math.random() * 600);
   }
 
-  await browser.close();
+  if (browser) await browser.close();
 
   const allTournaments = Object.values(teams).flatMap((t) => t.tournaments || []);
   const withScores = allTournaments.filter(
-    (t) => t.teamPlace || (t.players && t.players.length > 0),
+    (t) => t.teamPlace || t.teamTotal != null || (t.players && t.players.length > 0),
   );
 
   const payload = {
     scrapedAt: new Date().toISOString(),
     source: "clippd",
-    version: 4,
+    version: 5,
     teams,
     meta: {
       teamCount: TEAMS.length,
       successCount: Object.values(teams).filter((t) => !t.error).length,
       tournamentPagesVisited: allTournaments.length,
       tournamentsWithScores: withScores.length,
-      note: "v4 reads /scoring/team and /scoring/player. Hub pages alone never have scores. Scores are never invented.",
+      note: "v5: HTTP Chrome-UA + displayMode=stroke on team/player boards. Scores never invented.",
     },
   };
 
