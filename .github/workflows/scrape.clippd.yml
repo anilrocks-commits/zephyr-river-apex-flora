@@ -2,29 +2,35 @@ name: Scrape Clippd (daily)
 
 on:
   schedule:
-    # Every day at 06:00 UTC (~2am ET / 4pm AEST next day)
+    # Every day at 06:00 UTC
     - cron: "0 6 * * *"
-  workflow_dispatch: # allow manual runs from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: scrape-clippd
+  cancel-in-progress: false
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Needed so the bot can push the updated JSON back to main
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
-      # package-lock.json is currently out of sync with package.json,
-      # so npm ci fails. Use npm install until the lock is regenerated.
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
@@ -32,16 +38,31 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run Clippd scraper
-        run: node scripts/scrape-clippd.mjs
+        run: node scripts/scrape-clippd.mjs --recent
 
       - name: Commit updated live-results.json
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ ! -f public/data/live-results.json ]; then
+            echo "ERROR: public/data/live-results.json missing after scrape"
+            exit 1
+          fi
+
           git add public/data/live-results.json
+
           if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: update Clippd live-results $(date -u +%Y-%m-%d)"
-            git push
+            echo "No changes to commit (feed unchanged)"
+            exit 0
+          fi
+
+          git commit -m "chore: update Clippd live-results $(date -u +%Y-%m-%dT%H:%MZ)"
+
+          # Retry push once in case of a concurrent pages/deploy commit
+          if ! git push origin HEAD:main; then
+            echo "Push failed — rebasing onto origin/main and retrying"
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
