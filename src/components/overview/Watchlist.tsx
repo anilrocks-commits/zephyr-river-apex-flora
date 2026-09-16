@@ -1,13 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { PROGRAMS } from "@/data/programs";
 import { openingForecast, opportunityScore, allMetrics } from "@/lib/model";
+import { allProgramsLive, formatScraped } from "@/lib/live";
 import { Badge } from "@/components/ui/badge";
 
 export function Watchlist() {
-  const ranked = [...PROGRAMS].sort(
+  const programs = allProgramsLive(PROGRAMS);
+  const ranked = [...programs].sort(
     (a, b) => opportunityScore(b) - opportunityScore(a),
   );
-  const live = PROGRAMS.filter((p) => p.events.some((e) => e.status === "live"));
+  const live = programs.filter((p) => p.events.some((e) => e.status === "live"));
+  const scrapedAt = programs.find((p) => p.clippdScrapedAt)?.clippdScrapedAt;
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 pb-16">
@@ -19,8 +22,13 @@ export function Watchlist() {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
           Ten programs, scored by likely 2027 openings — not by how many seniors are on the
           roster. Open a school to read tournament scorecards, lineup moves, and 5th-year
-          probability. Clippd remains the live source; athletics recaps fill gaps and are labeled.
+          probability. Clippd is the live source; athletics recaps fill gaps and are labeled.
         </p>
+        {scrapedAt ? (
+          <p className="mt-2 text-[11px] text-subtle">
+            Clippd schedule {formatScraped(scrapedAt)}
+          </p>
+        ) : null}
       </header>
 
       {live.length > 0 ? (

@@ -24,9 +24,9 @@ export function TournamentCard({
 }) {
   const hasScores = event.scores.length > 0;
   const hasPostedRounds = event.scores.some((s) => s.rounds.some((r) => r != null));
-  const [open, setOpen] = useState(Boolean(defaultOpen ?? (hasScores || event.status === "live")));
-  const playerName = (id: string) =>
-    program.players.find((p) => p.id === id)?.name ?? id;
+  const [open, setOpen] = useState(Boolean(defaultOpen ?? (hasPostedRounds || event.status === "live")));
+  const playerName = (id: string, fallback?: string) =>
+    program.players.find((p) => p.id === id)?.name ?? fallback ?? id;
   const playerYear = (id: string) =>
     program.players.find((p) => p.id === id)?.year ?? "";
   const roundCount = Math.max(
@@ -47,6 +47,7 @@ export function TournamentCard({
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-display text-lg font-medium text-fg">{event.name}</h3>
             <Badge variant={statusVariant[event.status] ?? "default"}>{event.status}</Badge>
+            {event.source === "clippd" ? <Badge variant="accent">Clippd</Badge> : null}
           </div>
           <p className="mt-1 text-xs text-muted">
             {event.dates}
@@ -104,7 +105,9 @@ export function TournamentCard({
                   {event.scores.map((row) => (
                     <tr key={row.playerId} className="border-t border-border/80">
                       <td className="px-3 py-2.5">
-                        <div className="font-medium text-fg">{playerName(row.playerId)}</div>
+                        <div className="font-medium text-fg">
+                          {playerName(row.playerId, row.playerName)}
+                        </div>
                         <div className="text-[11px] text-subtle">{playerYear(row.playerId)}</div>
                       </td>
                       <td className="px-3 py-2.5">
@@ -133,8 +136,8 @@ export function TournamentCard({
           ) : (
             <p className="mt-4 rounded-lg bg-surface-2 px-3 py-3 text-sm text-muted">
               {event.status === "upcoming"
-                ? "No lineup posted yet. This card will carry the five-man unit and round scores once Clippd or the athletics recap publishes them."
-                : "Player scorecard not yet reconciled. Team totals are shown above when confirmed; individual rounds are not invented."}
+                ? "On the Clippd schedule. Lineup and round scores fill this card when the board posts them — nothing is invented."
+                : "Team listing is on Clippd. Individual rounds are not on the latest scrape yet; the athletics recap is used when it has a confirmed card."}
             </p>
           )}
 
@@ -175,7 +178,7 @@ export function TournamentCard({
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 text-accent hover:underline"
               >
-                Clippd <ExternalLink className="size-3" />
+                Clippd board <ExternalLink className="size-3" />
               </a>
             ) : null}
           </div>

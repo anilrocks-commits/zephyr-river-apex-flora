@@ -29,3 +29,14 @@ export function sourceLabel(kind: string): string {
   if (kind === "athletics") return "Athletics recap";
   return "Inferred";
 }
+
+export function formatScrapedAt(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const then = new Date(iso).getTime();
+  if (!Number.isFinite(then)) return "";
+  const hours = Math.max(0, Math.round((Date.now() - then) / 3_600_000));
+  if (hours < 1) return "just now";
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  return `${days}d ago`;
+}

@@ -16,6 +16,7 @@ export interface Player {
 
 export interface PlayerRound {
   playerId: string;
+  playerName?: string;
   role: Role;
   rounds: (number | null)[];
   toPar: number | null;
@@ -41,6 +42,7 @@ export interface Tournament {
   sourceLabel: string;
   sourceUrl: string;
   clippdUrl?: string;
+  clippdTournamentId?: string;
   note?: string;
   lineupNote?: string;
 }
@@ -72,4 +74,5 @@ export interface Program {
   events: Tournament[];
   insights: Insight[];
   rosterUnknown?: boolean;
+  clippdScrapedAt?: string;
 }

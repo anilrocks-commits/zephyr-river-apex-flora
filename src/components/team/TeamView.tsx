@@ -21,6 +21,7 @@ import { TournamentCard } from "@/components/team/TournamentCard";
 import { ToPar } from "@/components/team/ScoreCells";
 import { allMetrics, detectMoves, openingForecast } from "@/lib/model";
 import { isSeniorYear } from "@/lib/format";
+import { formatScraped, withLiveResults } from "@/lib/live";
 import { useIntelStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,8 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]["id"];
 
-export function TeamView({ program }: { program: Program }) {
+export function TeamView({ program: rawProgram }: { program: Program }) {
+  const program = withLiveResults(rawProgram);
   const [tab, setTab] = useState<TabId>("tournaments");
   const forecast = openingForecast(program);
   const metrics = allMetrics(program);
@@ -154,14 +156,30 @@ function Kpi({
 }
 
 function Tournaments({ program }: { program: Program }) {
+  const liveCount = program.events.filter((e) => e.status === "live").length;
+  const completeCount = program.events.filter(
+    (e) => e.status === "complete" || e.status === "historical",
+  ).length;
   return (
     <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 px-1">
+        <p className="text-xs text-muted">
+          {program.events.length} cards
+          {liveCount ? ` · ${liveCount} live` : ""}
+          {completeCount ? ` · ${completeCount} with results` : ""}
+        </p>
+        {program.clippdScrapedAt ? (
+          <p className="text-[11px] text-subtle">
+            Clippd schedule {formatScraped(program.clippdScrapedAt)}
+          </p>
+        ) : null}
+      </div>
       {program.events.map((event, i) => (
         <TournamentCard
           key={event.id}
           program={program}
           event={event}
-          defaultOpen={i === 0 || event.status === "live" || event.status === "complete"}
+          defaultOpen={i === 0 || event.status === "live" || (event.status === "complete" && i < 3)}
         />
       ))}
     </div>
