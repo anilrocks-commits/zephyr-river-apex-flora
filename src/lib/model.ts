@@ -422,11 +422,33 @@ export function predictNextSquad(program: Program, teamSize = 5): PredictedSquad
   return { team, individuals, eventsUsed, confidence, note };
 }
 
-/** Next upcoming event (earliest future start), or null */
+const MONTH_IDX: Record<string, number> = {
+  jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+  jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+};
+
+/** Parse tournament date strings like "Sep 21 - Sep 22, 2026" → start ms */
+function eventStartMs(dates: string | null | undefined): number {
+  if (!dates) return Number.POSITIVE_INFINITY;
+  const m = dates
+    .trim()
+    .match(
+      /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})(?:\s*[-–]\s*(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+)?(\d{1,2}))?,\s*(\d{4})$/i,
+    );
+  if (!m) return Number.POSITIVE_INFINITY;
+  const year = Number(m[5]);
+  const month = MONTH_IDX[m[1].slice(0, 3).toLowerCase()];
+  const day = Number(m[2]);
+  if (month == null || !year || !day) return Number.POSITIVE_INFINITY;
+  return new Date(year, month, day).getTime();
+}
+
+/** Next upcoming event by real calendar start (not string sort). */
 export function nextUpcomingEvent(program: Program): Tournament | null {
-  const upcoming = program.events
-    .filter((e) => e.status === "upcoming")
-    .slice()
-    .sort((a, b) => (a.dates || "").localeCompare(b.dates || ""));
-  return upcoming[0] ?? null;
+  const upcoming = program.events.filter((e) => e.status === "upcoming");
+  if (!upcoming.length) return null;
+  return (
+    [...upcoming].sort((a, b) => eventStartMs(a.dates) - eventStartMs(b.dates))[0] ??
+    null
+  );
 }
