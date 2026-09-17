@@ -1,18 +1,15 @@
 #!/usr/bin/env node
 /**
- * Clippd college golf scraper (v5)
+ * Clippd college golf scraper (v5.1)
  * --------------------------------
- * Scores: HTTP GET with a desktop Chrome User-Agent on
+ * Scores via HTTP + Chrome UA on:
  *   /tournaments/{id}/scoring/team?displayMode=stroke
  *   /tournaments/{id}/scoring/player?displayMode=stroke
- * Clippd SSR's the leaderboard into the first HTML response when the UA
- * looks like a real browser. Playwright is only used for schedule pages
- * (Load more + tournament links) when needed.
  *
  * Usage:
  *   node scripts/scrape-clippd.mjs
  *   node scripts/scrape-clippd.mjs --recent
- *   node scripts/scrape-clippd.mjs --headful   # schedule via Playwright headed
+ *   node scripts/scrape-clippd.mjs --headful
  */
 
 import { chromium } from "playwright";
@@ -62,7 +59,6 @@ function loadPrevious() {
   }
 }
 
-/** HTTP GET with browser-like headers (primary path for scoreboards). */
 async function httpGet(url) {
   const res = await fetch(url, {
     headers: {
@@ -89,6 +85,14 @@ function htmlToLines(html) {
 
 function htmlToFlat(html) {
   return htmlToLines(html).join(" ");
+}
+
+/** Strip hole-by-hole "Current Round 1 2 3 … IN RD No data available" noise. */
+function stripHoleNoise(flat) {
+  return flat
+    .replace(/Round\s*\d+\s*Total\s*Current\s*Round[\s\d]+IN\s*RD\s*No data available/gi, " | ")
+    .replace(/No data available/gi, " ")
+    .replace(/\b(?:OUT|IN|RD)\b/g, " ");
 }
 
 function parseRange(dates) {
@@ -254,6 +258,22 @@ function pickToVisit(schedule, links) {
 
 function extractMeta(htmlOrText) {
   const body = htmlOrText || "";
+  // Prefer <title>SCOREBOARD - Event Name (Men) Team Leaderboard</title>
+  const titleTag = body.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() || "";
+  let title = null;
+  const fromTitle = titleTag.match(
+    /SCOREBOARD\s*[-–]\s*(.+?)\s*(?:\(\s*(?:Men|Women)\s*\))?\s*(?:Team|Player)\s*Leaderboard/i,
+  );
+  if (fromTitle) title = fromTitle[1].trim();
+  if (!title) {
+    const flat = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    const m = flat.match(
+      /SCOREBOARD\s*[-–]\s*(.+?)\s*(?:\(\s*(?:Men|Women)\s*\))?\s*(?:Team|Player)\s*Leaderboard/i,
+    );
+    if (m) title = m[1].trim();
+  }
+  if (title && /^SCOREBOARD$/i.test(title)) title = null;
+
   const flat = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
   const venue =
     flat.match(/Venue\s*:\s*([^|]+?)(?:\s+Hosted|\s+Division|\s+Scoring|$)/i)?.[1]?.trim() ||
@@ -263,49 +283,56 @@ function extractMeta(htmlOrText) {
     flat.match(
       /((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:\s*[-–]\s*(?:[A-Za-z]+\.?\s+)?\d{1,2})?,?\s*\d{4})/i,
     )?.[1]?.trim() || null;
-  const title =
-    body.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.replace(/\s*[|–-].*$/, "").trim() ||
-    flat.match(/SCOREBOARD\s*-\s*([^(]+)/i)?.[1]?.trim() ||
-    null;
   return { venue, dates, title };
 }
 
 /**
- * Parse team stroke leaderboard from SSR HTML.
- * Example: "3 Seton Hall 846 F 283 286 277"
+ * Team stroke board. Clippd layout in SSR text:
+ *   {place} {movement?} {Team Name} {total} F {r1} {r2} {r3}
+ * e.g. "3 5 Seton Hall 846 F 283 286 277"
  */
 function parseTeamStrokeBoard(html, focusTeam) {
-  const flat = htmlToFlat(html);
-  // place, optional movement digit, team name, total, F, r1 r2 r3
-  const pat =
-    /(T?\d+)\s+(?:\d+\s+)?([A-Za-z][A-Za-z0-9 .&'()/-]{1,40}?)\s+(\d{3,4})\s+F\s+(\d{2,3})\s+(\d{2,3})\s+(\d{2,3})(?:\s+(\d{2,3}))?/g;
-
+  const flat = stripHoleNoise(htmlToFlat(html));
   const teamStandings = [];
   const seen = new Set();
+
+  // place + optional 1–2 digit movement + team + total + F + rounds
+  const pat =
+    /(T?\d{1,2})\s+(?:(\d{1,2})\s+)?([A-Za-z][A-Za-z0-9 .&'()/-]{1,42}?)\s+(\d{3,4})\s+F\s+((?:\d{2,3}\s+){0,3}\d{2,3})/g;
+
   let m;
   while ((m = pat.exec(flat)) !== null) {
-    const team = m[2].trim();
-    if (/^(round|total|current|data|available|thru|view)/i.test(team)) continue;
-    if (team.length < 2 || team.length > 40) continue;
+    const team = m[3].trim();
+    if (/^(round|total|current|data|available|thru|view|host|division|scoring)/i.test(team))
+      continue;
+    if (team.length < 2 || team.length > 42) continue;
+    // Reject if "team" looks like a run of numbers
+    if (/^\d+$/.test(team)) continue;
     const key = team.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    const rounds = [m[4], m[5], m[6], m[7]]
-      .filter(Boolean)
-      .map((n) => parseInt(n, 10));
+
+    const rounds = m[5]
+      .trim()
+      .split(/\s+/)
+      .map((n) => parseInt(n, 10))
+      .filter((n) => Number.isFinite(n) && n >= 50 && n <= 400)
+      .slice(0, 4);
+
     teamStandings.push({
       place: m[1],
       team,
-      total: parseInt(m[3], 10),
+      total: parseInt(m[4], 10),
       rounds,
       toPar: null,
+      movement: m[2] || null,
     });
   }
 
-  // Fallback: to-par view "3 - Seton Hall -6 F -1 +2 -7"
+  // to-par fallback: "3 - Seton Hall -6 F -1 +2 -7"
   if (!teamStandings.length) {
     const parPat =
-      /(\d+)\s*-\s*([A-Za-z][A-Za-z0-9 .&'()/-]+?)\s+([+-]?\d+|E)\s+F\s+([+-]?\d+|E)\s+([+-]?\d+|E)\s+([+-]?\d+|E)/gi;
+      /(T?\d{1,2})\s+-\s+([A-Za-z][A-Za-z0-9 .&'()/-]+?)\s+([+-]?\d+|E)\s+F\s+([+-]?\d+|E)\s+([+-]?\d+|E)\s+([+-]?\d+|E)/gi;
     while ((m = parPat.exec(flat)) !== null) {
       const team = m[2].trim();
       if (/round|current|data/i.test(team)) continue;
@@ -318,6 +345,7 @@ function parseTeamStrokeBoard(html, focusTeam) {
         total: null,
         rounds: [m[4], m[5], m[6]],
         toPar: m[3],
+        movement: null,
       });
     }
   }
@@ -328,9 +356,8 @@ function parseTeamStrokeBoard(html, focusTeam) {
 }
 
 /**
- * Parse player stroke leaderboard for one school from SSR HTML.
- * Layout (line-oriented after tag strip):
- *   place / name / Seton Hall / total / F / r1 / r2 / r3
+ * Player stroke board for one school.
+ * place / name / Team / total / F / r1 / r2 / r3  (ignore trailing junk)
  */
 function parsePlayerStrokeBoard(html, focusTeam) {
   const lines = htmlToLines(html);
@@ -343,32 +370,41 @@ function parsePlayerStrokeBoard(html, focusTeam) {
       const teamLabel = lines[i + 1];
       let place = null;
       for (const back of [2, 1, 3]) {
-        if (i >= back && /^T?\d+$/.test(lines[i - back])) {
+        if (i >= back && /^T?\d{1,3}$/.test(lines[i - back])) {
           place = lines[i - back];
           break;
         }
       }
       const nums = [];
       let j = i + 2;
-      while (j < lines.length && j < i + 14) {
+      while (j < lines.length && j < i + 12) {
         const t = lines[j];
         if (t === "F" || t === "-" || t === "E" || /^[+-]?\d+$/.test(t)) {
           nums.push(t);
           j += 1;
         } else break;
       }
-      const strokes = nums
-        .filter((x) => /^\d{2,3}$/.test(x))
-        .map((x) => parseInt(x, 10));
+
+      // Collect stroke integers in order; first >=150 is tournament total
+      const strokes = [];
+      for (const x of nums) {
+        if (/^\d{2,3}$/.test(x)) strokes.push(parseInt(x, 10));
+      }
+
       let total = null;
       let rounds = [];
       if (strokes.length && strokes[0] >= 150) {
         total = strokes[0];
-        rounds = strokes.slice(1, 5);
+        // Only the next 1–4 values that look like round scores (55–95 typical, allow 50–120)
+        rounds = strokes
+          .slice(1)
+          .filter((n) => n >= 50 && n <= 120)
+          .slice(0, 4);
       } else if (strokes.length) {
-        rounds = strokes.slice(0, 4);
-        total = rounds.reduce((a, b) => a + b, 0);
+        rounds = strokes.filter((n) => n >= 50 && n <= 120).slice(0, 4);
+        if (rounds.length) total = rounds.reduce((a, b) => a + b, 0);
       }
+
       const role = /\(IND\)/i.test(teamLabel) ? "ind" : "team";
       players.push({
         name,
@@ -446,7 +482,7 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
     result.name = meta.title;
     result.venue = meta.venue;
     result.dates = meta.dates;
-    result.rawSnippet = htmlToFlat(teamRes.text).slice(0, 4000);
+    result.rawSnippet = stripHoleNoise(htmlToFlat(teamRes.text)).slice(0, 4000);
 
     const { teamStandings, teamRow } = parseTeamStrokeBoard(
       teamRes.text,
@@ -472,20 +508,21 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
         0,
         40,
       );
-      result.rawSnippet = `${result.rawSnippet || ""}\n---PLAYER---\n${htmlToFlat(playerRes.text).slice(0, 4000)}`.slice(
+      result.rawSnippet = `${result.rawSnippet || ""}\n---PLAYER---\n${stripHoleNoise(htmlToFlat(playerRes.text)).slice(0, 4000)}`.slice(
         0,
         12000,
       );
     }
 
-    // Optional meta from public API (no scores)
     try {
       const api = await httpGet(
         `https://scoreboard.clippd.com/api/tournaments/${tournamentId}`,
       );
       if (api.ok) {
         const data = JSON.parse(api.text);
-        result.name = result.name || data.tournamentName || null;
+        if (!result.name || /^SCOREBOARD$/i.test(result.name)) {
+          result.name = data.tournamentName || result.name;
+        }
         result.venue = result.venue || data.venue || null;
         if (data.startDate && data.endDate) {
           const fmt = (iso) => {
@@ -605,7 +642,9 @@ function keepBetter(prev, scraped) {
       (t.players && t.players.length) || t.teamPlace || t.teamTotal != null;
     const oldHas =
       old &&
-      ((old.players && old.players.length) || old.teamPlace || old.teamTotal != null);
+      ((old.players && old.players.length) ||
+        old.teamPlace ||
+        old.teamTotal != null);
     if (!newHas && oldHas) return { ...old, lastEmptyAt: scraped.scrapedAt };
     return t;
   });
@@ -679,7 +718,7 @@ async function scrapeTeam(page, team) {
         detail.teamTotal != null ||
         (detail.players && detail.players.length);
       console.log(
-        `      status=${detail.status} place=${detail.teamPlace || "—"} total=${detail.teamTotal ?? "—"} players=${(detail.players || []).length}${scored ? " ✓" : ""}${detail.error ? " err=" + detail.error : ""}`,
+        `      status=${detail.status} name=${(detail.name || "").slice(0, 32)} place=${detail.teamPlace || "—"} total=${detail.teamTotal ?? "—"} players=${(detail.players || []).length}${scored ? " ✓" : ""}${detail.error ? " err=" + detail.error : ""}`,
       );
       await sleep(500 + Math.random() * 700);
     }
@@ -692,14 +731,15 @@ async function scrapeTeam(page, team) {
 }
 
 async function main() {
-  console.log("Clippd scraper v5 starting…");
-  console.log(`  mode=http-stroke  headful=${HEADFUL} recent=${RECENT_ONLY} teams=${TEAMS.length}`);
+  console.log("Clippd scraper v5.1 starting…");
+  console.log(
+    `  mode=http-stroke  headful=${HEADFUL} recent=${RECENT_ONLY} teams=${TEAMS.length}`,
+  );
 
   const previous = loadPrevious();
   let browser = null;
   let page = null;
 
-  // Playwright optional — only if schedule HTTP needs help
   try {
     browser = await chromium.launch({
       headless: !HEADFUL,
@@ -739,20 +779,21 @@ async function main() {
 
   const allTournaments = Object.values(teams).flatMap((t) => t.tournaments || []);
   const withScores = allTournaments.filter(
-    (t) => t.teamPlace || t.teamTotal != null || (t.players && t.players.length > 0),
+    (t) =>
+      t.teamPlace || t.teamTotal != null || (t.players && t.players.length > 0),
   );
 
   const payload = {
     scrapedAt: new Date().toISOString(),
     source: "clippd",
-    version: 5,
+    version: "5.1",
     teams,
     meta: {
       teamCount: TEAMS.length,
       successCount: Object.values(teams).filter((t) => !t.error).length,
       tournamentPagesVisited: allTournaments.length,
       tournamentsWithScores: withScores.length,
-      note: "v5: HTTP Chrome-UA + displayMode=stroke on team/player boards. Scores never invented.",
+      note: "v5.1: stroke boards + fixed place/title/round noise. Scores never invented.",
     },
   };
 
