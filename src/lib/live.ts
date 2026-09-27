@@ -113,7 +113,8 @@ export function parseEventRange(
   dates: string | null | undefined,
 ): { start: Date; end: Date } | null {
   if (!dates) return null;
-  const m = dates.trim().match(DATE_LINE);
+  const normalized = dates.trim().replace(/[–—]/g, "-");
+  const m = normalized.match(DATE_LINE);
   if (!m) return null;
   const year = Number(m[5]);
   const startMonth = MONTHS[m[1].slice(0, 3).toLowerCase()];
@@ -125,6 +126,31 @@ export function parseEventRange(
     start: new Date(year, startMonth - 1, startDay),
     end: new Date(year, endMonth - 1, endDay),
   };
+}
+
+/** 2026-27 NCAA season — fall golf starts in August. */
+export const SEASON_START = new Date(2026, 7, 1);
+
+export function isSeasonEvent(
+  dates: string | null | undefined,
+  name?: string | null,
+): boolean {
+  if (name && /prior spring|2025[-–\/]26/i.test(name)) return false;
+  const range = parseEventRange(dates);
+  if (range) return range.start.getTime() >= SEASON_START.getTime();
+  const raw = dates || "";
+  if (/spring\s*2026/i.test(raw) && !/2027/.test(raw)) return false;
+  const year = raw.match(/\b(20\d{2})\b/);
+  if (year && Number(year[1]) < 2026) return false;
+  if (
+    year &&
+    Number(year[1]) === 2026 &&
+    /(jan|feb|mar|apr|may|jun|jul)/i.test(raw) &&
+    !/(aug|sep|oct|nov|dec|fall)/i.test(raw)
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function eventStatusFromDates(
@@ -591,9 +617,13 @@ export function withLiveResults(
     merged.push(mergeOne(program, null, leftover, scrapedAt));
   }
 
+  const seasonEvents = sortEvents(merged).filter((e) => isSeasonEvent(e.dates, e.name));
+  const seasonIds = new Set(seasonEvents.map((e) => e.id));
+
   return {
     ...program,
-    events: sortEvents(merged),
+    events: seasonEvents,
+    insights: program.insights.filter((i) => !i.eventId || seasonIds.has(i.eventId)),
     clippdScrapedAt: scrapedAt || program.clippdScrapedAt,
   };
 }

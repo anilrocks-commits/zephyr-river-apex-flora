@@ -1,5 +1,6 @@
 import type { Player, PlayerRound, Program, Tournament } from "@/data/types";
 import { isSeniorYear } from "@/lib/format";
+import { isSeasonEvent } from "@/lib/live";
 
 export interface PlayerMetrics {
   player: Player;
@@ -42,12 +43,16 @@ export interface LineupMove {
 
 function completedEvents(program: Program): Tournament[] {
   return program.events.filter(
-    (e) => e.status === "complete" || e.status === "historical" || e.status === "live",
+    (e) =>
+      (e.status === "complete" || e.status === "historical" || e.status === "live") &&
+      isSeasonEvent(e.dates, e.name),
   );
 }
 
 function eventsWithLineup(program: Program): Tournament[] {
-  return program.events.filter((e) => e.scores.length > 0);
+  return program.events.filter(
+    (e) => e.scores.length > 0 && isSeasonEvent(e.dates, e.name),
+  );
 }
 
 export function playerMetrics(program: Program, player: Player): PlayerMetrics {
