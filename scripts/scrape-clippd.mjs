@@ -20,6 +20,7 @@ const TEAMS = [
   { id: "ksu", name: "Kennesaw State", clippdId: "4172" },
   { id: "shu", name: "Seton Hall", clippdId: "3163" },
   { id: "ucsb", name: "UC Santa Barbara", clippdId: "2520" },
+  { id: "memphis", name: "Memphis", clippdId: "3916" },
   { id: "man", name: "Manhattan", clippdId: "3652" },
   { id: "rochester", name: "Rochester", clippdId: "2457" },
 ];
