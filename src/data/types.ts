@@ -45,6 +45,7 @@ export interface Tournament {
   clippdTournamentId?: string;
   note?: string;
   lineupNote?: string;
+  canceledRounds?: boolean[];
 }
 
 export interface Insight {

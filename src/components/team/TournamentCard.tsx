@@ -30,11 +30,19 @@ export function TournamentCard({
     program.players.find((p) => p.id === id)?.name ?? fallback ?? id;
   const playerYear = (id: string) =>
     program.players.find((p) => p.id === id)?.year ?? "";
-  const roundCount = Math.max(
-    event.teamRounds.length,
-    ...event.scores.map((s) => s.rounds.length),
-    3,
+  const canceled = event.canceledRounds ?? [];
+  const lastFilled = (rounds: (number | null)[]) => {
+    let last = -1;
+    for (let i = 0; i < rounds.length; i += 1) if (rounds[i] != null) last = i;
+    return last;
+  };
+  const lastCanceled = canceled.lastIndexOf(true);
+  const lastPlayed = Math.max(
+    lastFilled(event.teamRounds),
+    ...event.scores.map((s) => lastFilled(s.rounds)),
+    -1,
   );
+  const roundCount = Math.max(lastPlayed, lastCanceled, 0) + 1;
   const roundLabels = Array.from({ length: roundCount }, (_, i) => `R${i + 1}`);
 
   // Predicted squad only on the next upcoming event (and only when we have lineup history)
@@ -83,7 +91,7 @@ export function TournamentCard({
 
       {open ? (
         <div className="border-t border-border px-4 pb-5 pt-4 sm:px-5">
-          <TeamLine event={event} roundLabels={roundLabels} />
+          <TeamLine event={event} roundLabels={roundLabels} canceled={canceled} />
 
           {event.lineupNote ? (
             <p className="mt-3 rounded-lg bg-surface-2 px-3 py-2 text-xs leading-relaxed text-muted">
@@ -125,6 +133,7 @@ export function TournamentCard({
                             score={row.rounds[i] ?? null}
                             par={event.par}
                             counted={row.counted[i]}
+                            canceled={Boolean(canceled[i])}
                           />
                         </td>
                       ))}
@@ -199,15 +208,21 @@ export function TournamentCard({
 function TeamLine({
   event,
   roundLabels,
+  canceled,
 }: {
   event: Tournament;
   roundLabels: string[];
+  canceled: boolean[];
 }) {
-  if (!event.teamRounds.length && !event.teamPlace) return null;
+  if (!event.teamRounds.length && !event.teamPlace && !canceled.some(Boolean)) return null;
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
       {roundLabels.map((label, i) => (
-        <Stat key={label} label={label} value={event.teamRounds[i] ?? "—"} />
+        <Stat
+          key={label}
+          label={label}
+          value={canceled[i] ? "CNCL" : (event.teamRounds[i] ?? "—")}
+        />
       ))}
       <Stat label="Total" value={event.teamTotal ?? "—"} />
       <Stat label="To par" value={event.teamToPar != null ? event.teamToPar : "—"} par />

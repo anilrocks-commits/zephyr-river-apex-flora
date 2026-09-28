@@ -27,11 +27,20 @@ export function RoundCell({
   score,
   par,
   counted,
+  canceled,
 }: {
   score: number | null | undefined;
   par: number;
   counted: boolean | null | undefined;
+  canceled?: boolean;
 }) {
+  if (canceled) {
+    return (
+      <span className="font-mono text-[10px] uppercase tracking-wide text-subtle" title="Round cancelled">
+        CNCL
+      </span>
+    );
+  }
   if (score == null) {
     return <span className="font-mono text-subtle">—</span>;
   }

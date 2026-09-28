@@ -269,8 +269,14 @@ function parseTeamStrokeBoard(html, focusTeam) {
   const teamStandings = [];
   const seen = new Set();
 
+  const roundTok = (t) => {
+    if (!t || /CNCL/i.test(t)) return null;
+    const n = parseInt(t, 10);
+    return Number.isFinite(n) && n >= 50 && n <= 400 ? n : null;
+  };
+
   const pat =
-    /(?<![\d])(T?\d{1,2})\s+(?:(\d{1,2})\s+)?([A-Z](?:[A-Za-z0-9.&'()\/-]| (?=[A-Za-z(])){1,40}?)\s+(\d{3,4})\s+F\s+(\d{2,3})\s+(\d{2,3})\s+(\d{2,3})(?:\s+(\d{2,3}))?(?!\d)/g;
+    /(?<![\d])(T?\d{1,2})\s+(?:-\s+|(\d{1,2})\s+)?([A-Z](?:[A-Za-z0-9.&'()\/-]| (?=[A-Za-z(])){1,40}?)\s+(\d{3,4})\s+F\s+(\d{2,3}|CNCL)\s+(\d{2,3}|CNCL)\s+(\d{2,3}|CNCL)(?:\s+(\d{2,3}|CNCL))?(?!\d)/gi;
 
   let m;
   while ((m = pat.exec(flat)) !== null) {
@@ -287,11 +293,7 @@ function parseTeamStrokeBoard(html, focusTeam) {
     if (seen.has(key)) continue;
     seen.add(key);
 
-    const rounds = [m[5], m[6], m[7], m[8]]
-      .filter(Boolean)
-      .map((n) => parseInt(n, 10))
-      .filter((n) => Number.isFinite(n) && n >= 50 && n <= 400)
-      .slice(0, 4);
+    const rounds = [m[5], m[6], m[7], m[8]].map(roundTok);
 
     teamStandings.push({
       place: m[1],
@@ -328,6 +330,10 @@ function parseTeamStrokeBoard(html, focusTeam) {
   return { teamStandings, teamRow };
 }
 
+function isCanceledToken(t) {
+  return /^(CNCL|CANCEL+ED|NS|NC)$/i.test(t);
+}
+
 function parsePlayerStrokeBoard(html, focusTeam) {
   const lines = htmlToLines(html);
   const nameRe = /^[A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+)+$/;
@@ -344,32 +350,45 @@ function parsePlayerStrokeBoard(html, focusTeam) {
           break;
         }
       }
-      const nums = [];
+      const tokens = [];
       let j = i + 2;
-      while (j < lines.length && j < i + 12) {
+      while (j < lines.length && j < i + 14) {
         const t = lines[j];
-        if (t === "F" || t === "-" || t === "E" || /^[+-]?\d+$/.test(t)) {
-          nums.push(t);
+        if (
+          t === "F" ||
+          t === "-" ||
+          t === "E" ||
+          /^[+-]?\d+$/.test(t) ||
+          isCanceledToken(t)
+        ) {
+          tokens.push(t);
           j += 1;
         } else break;
       }
 
-      const strokes = [];
-      for (const x of nums) {
-        if (/^\d{2,3}$/.test(x)) strokes.push(parseInt(x, 10));
+      // Clippd stroke board: TOTAL  THRU(F)  RD1  RD2  RD3
+      const thruIdx = tokens.findIndex((t) => t === "F");
+      let total = null;
+      let roundToks = [];
+      if (thruIdx >= 1 && /^\d{2,4}$/.test(tokens[0])) {
+        total = parseInt(tokens[0], 10);
+        roundToks = tokens.slice(thruIdx + 1);
+      } else {
+        roundToks = tokens.filter((t) => /^\d{2,3}$/.test(t) || isCanceledToken(t) || t === "-");
       }
 
-      let total = null;
-      let rounds = [];
-      if (strokes.length && strokes[0] >= 150) {
-        total = strokes[0];
-        rounds = strokes
-          .slice(1)
-          .filter((n) => n >= 50 && n <= 120)
-          .slice(0, 3);
-      } else if (strokes.length) {
-        rounds = strokes.filter((n) => n >= 50 && n <= 120).slice(0, 3);
-        if (rounds.length) total = rounds.reduce((a, b) => a + b, 0);
+      const rounds = roundToks.map((t) => {
+        if (isCanceledToken(t) || t === "-") return null;
+        if (/^\d{2,3}$/.test(t)) {
+          const n = parseInt(t, 10);
+          return n >= 50 && n <= 120 ? n : null;
+        }
+        return null;
+      });
+
+      if (total == null) {
+        const played = rounds.filter((n) => n != null);
+        if (played.length) total = played.reduce((a, b) => a + b, 0);
       }
 
       const role = /\(IND\)/i.test(teamLabel) ? "ind" : "team";

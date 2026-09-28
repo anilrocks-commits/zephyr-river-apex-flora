@@ -10,7 +10,7 @@ import rawLive from "../../public/data/live-results.json";
 
 export interface LivePlayerScore {
   name: string;
-  rounds: number[];
+  rounds: (number | null)[];
   total?: number | null;
   toPar?: string | number | null;
   finish?: string | null;
@@ -27,7 +27,7 @@ export interface LiveTournament {
   teamPlace?: string | number | null;
   teamTotal?: number | null;
   teamToPar?: string | number | null;
-  teamRounds?: number[];
+  teamRounds?: (number | null)[];
   players?: LivePlayerScore[];
   teamStandings?: { place?: string; team?: string }[];
   error?: string | null;
@@ -320,18 +320,85 @@ function matchPlayer(players: Player[], name: string): Player | undefined {
   return undefined;
 }
 
-function liveScoresToRows(program: Program, live: LiveTournament): PlayerRound[] {
+function canceledRoundFlags(live: LiveTournament): boolean[] {
+  const blob = live.rawSnippet || "";
+  const flags = [false, false, false, false];
+  const re = /Round\s+(\d+)\s+Cancel+ed/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(blob))) {
+    const n = Number(m[1]);
+    if (n >= 1 && n <= 4) flags[n - 1] = true;
+  }
+  return flags;
+}
+
+function applyCanceledRounds(
+  rounds: (number | null)[],
+  flags: boolean[],
+): (number | null)[] {
+  const lastFlag = flags.lastIndexOf(true);
+  const len = Math.max(rounds.length, lastFlag + 1);
+  if (len <= 0) return rounds;
+  return Array.from({ length: len }, (_, i) =>
+    flags[i] ? null : rounds[i] ?? null,
+  );
+}
+
+function playedTotal(rounds: (number | null)[], fallback: number | null): number | null {
+  const played = rounds.filter((r): r is number => r != null);
+  if (played.length === 1) return played[0];
+  if (played.length > 1) return played.reduce((a, b) => a + b, 0);
+  return fallback;
+}
+
+function salvageTeamFromSnippet(
+  live: LiveTournament,
+  teamName: string,
+): LiveTournament {
+  if (live.teamPlace != null && (live.teamRounds?.length ?? 0) > 0) return live;
+  const blob = live.rawSnippet || "";
+  if (!blob || !teamName) return live;
+  const escaped = teamName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(
+    `(T?\\d{1,2})\\s+-\\s+${escaped}\\s+(\\d{3,4})\\s+F\\s+(\\d{2,4}|CNCL)\\s+(\\d{2,4}|CNCL)\\s+(\\d{2,4}|CNCL)`,
+    "i",
+  );
+  const m = blob.match(re);
+  if (!m) return live;
+  const tok = (t: string) => (/CNCL/i.test(t) ? null : Number(t));
+  return {
+    ...live,
+    teamPlace: live.teamPlace ?? m[1],
+    teamTotal: live.teamTotal ?? Number(m[2]),
+    teamRounds:
+      live.teamRounds && live.teamRounds.length
+        ? live.teamRounds
+        : [tok(m[3]), tok(m[4]), tok(m[5])],
+  };
+}
+
+function liveScoresToRows(program: Program, live: LiveTournament, par?: number): PlayerRound[] {
+  const flags = canceledRoundFlags(live);
   const players = live.players ?? [];
   const rows: PlayerRound[] = players.map((p) => {
     const matched = matchPlayer(program.players, p.name);
     const role: Role = p.role === "ind" ? "ind" : p.role === "dnp" ? "dnp" : "team";
-    const rounds = (p.rounds ?? []).map((r) => (Number.isFinite(r) ? r : null));
+    const raw = (p.rounds ?? []).map((r) => (Number.isFinite(r) ? r : null));
+    const rounds = applyCanceledRounds(raw, flags);
+    const toPar =
+      parseToPar(p.toPar) ??
+      (par
+        ? rounds.reduce<number | null>((acc, r) => {
+            if (r == null) return acc;
+            return (acc ?? 0) + (r - par);
+          }, null)
+        : null);
     return {
       playerId: matched?.id ?? `clippd:${slug(p.name)}`,
       playerName: p.name,
       role,
       rounds,
-      toPar: parseToPar(p.toPar),
+      toPar,
       finish: p.finish ?? null,
       counted: rounds.map(() => null),
     };
@@ -427,12 +494,18 @@ function liveEventToTournament(
   live: LiveTournament,
   scrapedAt: string,
 ): Tournament {
-  const scores = liveScoresToRows(program, live);
+  live = salvageTeamFromSnippet(live, program.name);
+  const flags = canceledRoundFlags(live);
+  const scores = liveScoresToRows(program, live, 72);
   const dates = live.dates || "TBA";
+  const teamRounds = applyCanceledRounds(live.teamRounds ?? [], flags);
   const hasScores = scores.some((s) => s.rounds.some((r) => r != null)) || live.teamTotal != null;
   const id = live.tournamentId
     ? `${program.id}-clippd-${live.tournamentId}`
     : `${program.id}-${slug(live.name || dates)}`;
+  const canceledNote = flags.some(Boolean)
+    ? `Round ${flags.map((c, i) => (c ? i + 1 : null)).filter(Boolean).join("–")} cancelled.`
+    : null;
   return {
     id,
     name: live.name || "Unnamed tournament",
@@ -443,8 +516,8 @@ function liveEventToTournament(
     fieldPlayers: null,
     status: eventStatusFromDates(dates, hasScores),
     teamPlace: live.teamPlace != null ? String(live.teamPlace) : null,
-    teamRounds: live.teamRounds ?? [],
-    teamTotal: live.teamTotal ?? null,
+    teamRounds,
+    teamTotal: playedTotal(teamRounds, live.teamTotal ?? null),
     teamToPar: parseToPar(live.teamToPar),
     scores,
     source: "clippd",
@@ -454,6 +527,8 @@ function liveEventToTournament(
     sourceUrl: live.url || program.clippdSchedule,
     clippdUrl: live.url || program.clippdSchedule,
     clippdTournamentId: live.tournamentId ?? undefined,
+    canceledRounds: flags.some(Boolean) ? flags : undefined,
+    note: canceledNote || undefined,
   };
 }
 
@@ -475,19 +550,28 @@ function mergeOne(
           : eventStatusFromDates(curated.dates, hasScores),
     };
   }
-  const liveEvent = live as LiveTournament;
+  const liveEvent = salvageTeamFromSnippet(live as LiveTournament, program.name);
   const base = curated as Tournament;
-  const liveRows = liveScoresToRows(program, liveEvent);
+  const flags = canceledRoundFlags(liveEvent);
+  const liveRows = liveScoresToRows(program, liveEvent, base.par);
   const liveHasScores =
     liveRows.some((s) => s.rounds.some((r) => r != null)) || liveEvent.teamTotal != null;
   const scores = liveHasScores ? liveRows : base.scores;
   const dates = liveEvent.dates || base.dates;
+  const teamRounds = applyCanceledRounds(
+    liveEvent.teamRounds?.length ? liveEvent.teamRounds : base.teamRounds,
+    flags,
+  );
   const hasScores = hasPostedScores({
     ...base,
     scores,
     teamPlace: liveEvent.teamPlace != null ? String(liveEvent.teamPlace) : base.teamPlace,
     teamTotal: liveEvent.teamTotal ?? base.teamTotal,
   });
+  const cancelLabel = flags
+    .map((c, i) => (c ? `R${i + 1}` : null))
+    .filter(Boolean)
+    .join(" and ");
   return {
     ...base,
     name: base.name,
@@ -496,8 +580,8 @@ function mergeOne(
     status: eventStatusFromDates(dates, hasScores),
     teamPlace:
       liveEvent.teamPlace != null ? String(liveEvent.teamPlace) : base.teamPlace,
-    teamRounds: liveEvent.teamRounds?.length ? liveEvent.teamRounds : base.teamRounds,
-    teamTotal: liveEvent.teamTotal ?? base.teamTotal,
+    teamRounds,
+    teamTotal: playedTotal(teamRounds, liveEvent.teamTotal ?? base.teamTotal),
     teamToPar: parseToPar(liveEvent.teamToPar) ?? base.teamToPar,
     fieldTeams: liveEvent.teamStandings?.length || base.fieldTeams,
     scores,
@@ -508,6 +592,12 @@ function mergeOne(
     sourceUrl: liveHasScores ? liveEvent.url || base.sourceUrl : base.sourceUrl,
     clippdUrl: liveEvent.url || base.clippdUrl || program.clippdSchedule,
     clippdTournamentId: liveEvent.tournamentId ?? base.clippdTournamentId,
+    canceledRounds: flags.some(Boolean) ? flags : base.canceledRounds,
+    note: cancelLabel
+      ? [base.note, `${cancelLabel} cancelled — only completed rounds are scored.`]
+          .filter(Boolean)
+          .join(" ")
+      : base.note,
   };
 }
 
