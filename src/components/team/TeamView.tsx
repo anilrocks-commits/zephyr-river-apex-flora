@@ -600,6 +600,77 @@ function Forecast({
           No seniors flagged on this roster snapshot.
         </p>
       )}
+
+      <CommitsSection program={program} theoretical={forecast.theoretical} />
     </div>
+  );
+}
+
+function CommitsSection({
+  program,
+  theoretical,
+}: {
+  program: Program;
+  theoretical: string;
+}) {
+  const commits = (program.commits ?? []).filter((c) => c.classYear === 2027);
+  return (
+    <section className="rounded-xl bg-surface px-4 py-4 shadow-[var(--shadow-border)] sm:px-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="font-display text-base font-medium">2027 public commits</h3>
+        <span className="text-xs text-subtle">
+          {commits.length} logged
+          {theoretical && theoretical !== "Unknown" ? ` · vs ${theoretical} theoretical openings` : ""}
+        </span>
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-subtle">
+        Players often announce on social before the school posts an NLI. Verbals are not
+        official until signed — and they fill 2027 seats the same way a freshman already on
+        campus does.
+      </p>
+      {commits.length === 0 ? (
+        <p className="mt-3 rounded-lg bg-surface-2 px-3 py-3 text-sm text-muted">
+          No public 2027 commits logged yet for {program.short}.
+        </p>
+      ) : (
+        <ul className="mt-3 flex flex-col gap-2">
+          {commits.map((c) => (
+            <li
+              key={c.id}
+              className="flex flex-col gap-1 rounded-lg bg-surface-2 px-3 py-2.5 sm:flex-row sm:items-baseline sm:justify-between"
+            >
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium text-fg">{c.name}</span>
+                  <Badge variant={c.status === "signed" ? "accent" : "warn"}>
+                    {c.status === "signed" ? "Signed" : "Verbal"}
+                  </Badge>
+                </div>
+                <div className="mt-0.5 text-xs text-muted">
+                  {c.hometown}
+                  {c.highSchool ? ` · ${c.highSchool}` : ""}
+                  <span className="text-subtle"> · class of {c.classYear}</span>
+                </div>
+                {c.note ? (
+                  <p className="mt-1 text-xs leading-relaxed text-subtle">{c.note}</p>
+                ) : null}
+              </div>
+              {c.sourceUrl ? (
+                <a
+                  href={c.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex shrink-0 items-center gap-1 text-xs text-accent hover:underline"
+                >
+                  {c.source} <ExternalLink className="size-3" />
+                </a>
+              ) : (
+                <span className="text-xs text-subtle">{c.source}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

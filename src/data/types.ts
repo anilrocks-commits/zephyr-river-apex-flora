@@ -76,4 +76,19 @@ export interface Program {
   insights: Insight[];
   rosterUnknown?: boolean;
   clippdScrapedAt?: string;
+  commits?: RecruitCommit[];
+}
+
+export type CommitStatus = "verbal" | "signed";
+
+export interface RecruitCommit {
+  id: string;
+  name: string;
+  classYear: number;
+  hometown: string;
+  highSchool?: string;
+  status: CommitStatus;
+  source: string;
+  sourceUrl?: string;
+  note?: string;
 }
