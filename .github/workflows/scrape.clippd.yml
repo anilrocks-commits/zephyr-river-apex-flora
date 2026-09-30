@@ -1,4 +1,4 @@
-name: Scrape Clippd (daily)
+name: Scrape Clippd + 2027 commits (daily)
 
 on:
   schedule:
@@ -16,13 +16,12 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Needed so the bot can push the updated JSON back to main
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
@@ -39,28 +38,26 @@ jobs:
 
       - name: Run Clippd scraper
         run: node scripts/scrape-clippd.mjs --recent
+        continue-on-error: true
 
-      - name: Commit updated live-results.json
+      - name: Run 2027 commits scraper
+        run: node scripts/scrape-commits.mjs
+
+      - name: Commit updated data feeds
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if [ ! -f public/data/live-results.json ]; then
-            echo "ERROR: public/data/live-results.json missing after scrape"
-            exit 1
-          fi
-
-          git add public/data/live-results.json
+          git add public/data/live-results.json public/data/commits.json
 
           if git diff --staged --quiet; then
-            echo "No changes to commit (feed unchanged)"
+            echo "No changes to commit (feeds unchanged)"
             exit 0
           fi
 
-          git commit -m "chore: update Clippd live-results $(date -u +%Y-%m-%dT%H:%MZ)"
+          git commit -m "chore: update live results + 2027 commits $(date -u +%Y-%m-%dT%H:%MZ)"
 
-          # Retry push once in case of a concurrent pages/deploy commit
           if ! git push origin HEAD:main; then
             echo "Push failed — rebasing onto origin/main and retrying"
             git pull --rebase origin main

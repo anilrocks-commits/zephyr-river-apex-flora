@@ -28,6 +28,7 @@ import {
 } from "@/lib/model";
 import { isSeniorYear } from "@/lib/format";
 import { formatScraped, withLiveResults } from "@/lib/live";
+import { withCommits, SCRAPED_COMMITS } from "@/lib/commits";
 import { useIntelStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +42,7 @@ const tabs = [
 type TabId = (typeof tabs)[number]["id"];
 
 export function TeamView({ program: rawProgram }: { program: Program }) {
-  const program = withLiveResults(rawProgram);
+  const program = withCommits(withLiveResults(rawProgram));
   const [tab, setTab] = useState<TabId>("tournaments");
   const forecast = openingForecast(program);
   const metrics = allMetrics(program);
@@ -627,6 +628,9 @@ function CommitsSection({
         Players often announce on social before the school posts an NLI. Verbals are not
         official until signed — and they fill 2027 seats the same way a freshman already on
         campus does.
+        {SCRAPED_COMMITS.scrapedAt
+          ? ` Last checked ${formatScraped(SCRAPED_COMMITS.scrapedAt)}.`
+          : " Daily scraper has not run yet."}
       </p>
       {commits.length === 0 ? (
         <p className="mt-3 rounded-lg bg-surface-2 px-3 py-3 text-sm text-muted">

@@ -15,15 +15,7 @@ const ROOT = join(__dirname, "..");
 const OUT_DIR = join(ROOT, "public", "data");
 const OUT_FILE = join(OUT_DIR, "live-results.json");
 
-const TEAMS = [
-  { id: "siu", name: "Southern Illinois", clippdId: "4127" },
-  { id: "ksu", name: "Kennesaw State", clippdId: "4172" },
-  { id: "shu", name: "Seton Hall", clippdId: "3163" },
-  { id: "ucsb", name: "UC Santa Barbara", clippdId: "2520" },
-  { id: "memphis", name: "Memphis", clippdId: "3916" },
-  { id: "man", name: "Manhattan", clippdId: "3652" },
-  { id: "rochester", name: "Rochester", clippdId: "2457" },
-];
+import { CLIPPD_TEAMS as TEAMS } from "./watchlist.mjs";
 
 const MAX_TOURNAMENTS_PER_TEAM = 8;
 const HEADFUL = process.argv.includes("--headful");

@@ -1,0 +1,147 @@
+{
+  "scrapedAt": "2026-09-29T11:29:08.933Z",
+  "classYear": 2027,
+  "source": "collegegolfcommits.com + athletics news",
+  "teams": {
+    "siu": {
+      "id": "siu",
+      "name": "Southern Illinois",
+      "commits": []
+    },
+    "ksu": {
+      "id": "ksu",
+      "name": "Kennesaw State",
+      "commits": [
+        {
+          "id": "ksu-c-cole-rosich",
+          "name": "Cole Rosich",
+          "classYear": 2027,
+          "hometown": "Bogart, GA",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1kl",
+          "note": "Two Top 10 AJGA finishes in 2025; 2025 Georgia Junior Amateur: 5th; Seven top 10 Finishes in 2025"
+        }
+      ]
+    },
+    "shu": {
+      "id": "shu",
+      "name": "Seton Hall",
+      "commits": [
+        {
+          "id": "shu-c-taeyoung-lim",
+          "name": "Taeyoung Lim",
+          "classYear": 2027,
+          "hometown": "South Korea",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1s",
+          "note": "2026 AJGA Jr at Rayburn Resort: 5th; 2026 Junior Orange Bowl Int'l: 7th; 2024 Junior Series #7 Central Region: 2nd"
+        },
+        {
+          "id": "shu-c-tuan-anh-nguyen",
+          "name": "Tuan Anh Nguyen",
+          "classYear": 2027,
+          "hometown": "Vietnam",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1s",
+          "note": "Thailand Men's Amateur champion; Singha Pro Championship: 2nd"
+        },
+        {
+          "id": "shu-c-will-burgwyn",
+          "name": "Will Burgwyn",
+          "classYear": 2027,
+          "hometown": "Cary, NC",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1s",
+          "note": "Drip Tour Forest Creek Junior Open champion; One CGA win &amp; one runner-up finish; 35th Annual CPGA Charles Tilghman: 2nd"
+        }
+      ]
+    },
+    "ucsb": {
+      "id": "ucsb",
+      "name": "UC Santa Barbara",
+      "commits": []
+    },
+    "memphis": {
+      "id": "memphis",
+      "name": "Memphis",
+      "commits": [
+        {
+          "id": "memphis-c-eskil-torefors",
+          "name": "Eskil Torefors",
+          "classYear": 2027,
+          "hometown": "Sweden",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1m",
+          "note": "One win &amp; five top-10 finishes in Sweden Junior events in 2025"
+        },
+        {
+          "id": "memphis-c-evan-menges",
+          "name": "Evan Menges",
+          "classYear": 2027,
+          "hometown": "Dublin, OH",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1m",
+          "note": "One Golfweek Jr Tour win &amp; four top-10 finishes in 2025; Two AJGA top-10 finishes in 2025"
+        }
+      ]
+    },
+    "howard": {
+      "id": "howard",
+      "name": "Howard",
+      "commits": []
+    },
+    "man": {
+      "id": "man",
+      "name": "Manhattan",
+      "commits": [
+        {
+          "id": "man-c-myles-jackson",
+          "name": "Myles Jackson",
+          "classYear": 2027,
+          "hometown": "Hillsborough, NJ",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1m",
+          "note": "2026 NJPGA Garden State Jr Shootout: 3rd"
+        }
+      ]
+    },
+    "fdu": {
+      "id": "fdu",
+      "name": "Fairleigh Dickinson",
+      "commits": []
+    },
+    "umhb": {
+      "id": "umhb",
+      "name": "UMHB",
+      "commits": []
+    },
+    "rochester": {
+      "id": "rochester",
+      "name": "University of Rochester",
+      "commits": []
+    },
+    "cmu": {
+      "id": "cmu",
+      "name": "Carnegie Mellon",
+      "commits": [
+        {
+          "id": "cmu-c-ziqi-lang",
+          "name": "Ziqi Lang",
+          "classYear": 2027,
+          "hometown": "China",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd3",
+          "note": ""
+        }
+      ]
+    }
+  }
+}

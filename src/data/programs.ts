@@ -241,16 +241,6 @@ export const PROGRAMS: Program[] = [
     ],
     commits: [
       {
-        id: "ksu-c-ramirez",
-        name: "Martin Ramirez",
-        classYear: 2027,
-        hometown: "Colombia",
-        status: "verbal",
-        source: "College Golf Commits",
-        sourceUrl: "https://collegegolfcommits.com/2027boysd1kl",
-        note: "Three junior wins and five top-5s in Colombia (2025–26). Player-announced; KSU has not posted a 2027 signing class.",
-      },
-      {
         id: "ksu-c-rosich",
         name: "Cole Rosich",
         classYear: 2027,
