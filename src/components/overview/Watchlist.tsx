@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { PROGRAMS } from "@/data/programs";
 import { openingForecast, opportunityScore, allMetrics } from "@/lib/model";
-import { allProgramsLive, formatScraped } from "@/lib/live";
+import { formatScraped } from "@/lib/live";
+import { useWatchlist } from "@/lib/watchlist";
 import { Badge } from "@/components/ui/badge";
+import { AddCollege } from "@/components/overview/AddCollege";
 
 export function Watchlist() {
-  const programs = allProgramsLive(PROGRAMS);
+  const programs = useWatchlist();
   const ranked = [...programs].sort(
     (a, b) => opportunityScore(b) - opportunityScore(a),
   );
@@ -20,9 +21,9 @@ export function Watchlist() {
           Watch list
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-          Ten programs, scored by likely 2027 openings — not by how many seniors are on the
+          Programs scored by likely 2027 openings — not by how many seniors are on the
           roster. Open a school to read tournament scorecards, lineup moves, and 5th-year
-          probability. Clippd is the live source; athletics recaps fill gaps and are labeled.
+          probability. Add any Clippd team from the form below.
         </p>
         {scrapedAt ? (
           <p className="mt-2 text-[11px] text-subtle">
@@ -30,6 +31,8 @@ export function Watchlist() {
           </p>
         ) : null}
       </header>
+
+      <AddCollege />
 
       {live.length > 0 ? (
         <section>
@@ -83,6 +86,7 @@ export function Watchlist() {
                   <div className="flex items-center gap-2">
                     <h2 className="font-display text-xl font-medium text-fg">{p.name}</h2>
                     <Badge variant={p.div === "D3" ? "default" : "accent"}>{p.div}</Badge>
+                    {p.custom ? <Badge variant="warn">Custom</Badge> : null}
                   </div>
                   <p className="mt-1 text-xs text-muted">
                     {p.conf}

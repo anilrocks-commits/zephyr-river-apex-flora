@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   ExternalLink,
   Flag,
@@ -27,8 +28,9 @@ import {
   nextUpcomingEvent,
 } from "@/lib/model";
 import { isSeniorYear } from "@/lib/format";
-import { formatScraped, withLiveResults } from "@/lib/live";
-import { withCommits, SCRAPED_COMMITS } from "@/lib/commits";
+import { formatScraped } from "@/lib/live";
+import { SCRAPED_COMMITS } from "@/lib/commits";
+import { hydrateProgram } from "@/lib/watchlist";
 import { useIntelStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -42,13 +44,39 @@ const tabs = [
 type TabId = (typeof tabs)[number]["id"];
 
 export function TeamView({ program: rawProgram }: { program: Program }) {
-  const program = withCommits(withLiveResults(rawProgram));
+  const customLive = useIntelStore((s) => s.customLive);
+  const program = hydrateProgram(rawProgram, customLive);
   const [tab, setTab] = useState<TabId>("tournaments");
+  const [refreshing, setRefreshing] = useState(false);
   const forecast = openingForecast(program);
   const metrics = allMetrics(program);
   const starred = useIntelStore((s) => s.starred);
   const toggleStar = useIntelStore((s) => s.toggleStar);
+  const addCustomProgram = useIntelStore((s) => s.addCustomProgram);
+  const removeCustomProgram = useIntelStore((s) => s.removeCustomProgram);
   const isStarred = starred.includes(program.id);
+  const navigate = useNavigate();
+
+  async function refreshCustom() {
+    if (!program.clippd) return;
+    setRefreshing(true);
+    try {
+      const res = await fetch("/api/college", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ input: program.clippd, takenIds: [program.id], refresh: true }),
+      });
+      const data = await res.json();
+      if (res.ok && data.program) {
+        addCustomProgram(
+          { ...data.program, id: program.id, custom: true },
+          { ...data.live, id: program.id },
+        );
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 pb-16">
@@ -90,6 +118,23 @@ export function TeamView({ program: rawProgram }: { program: Program }) {
               Roster <ExternalLink className="size-3.5" />
             </a>
           </Button>
+          {program.custom ? (
+            <>
+              <Button variant="secondary" size="sm" disabled={refreshing} onClick={() => void refreshCustom()}>
+                {refreshing ? "Refreshing…" : "Refresh scores"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  removeCustomProgram(program.id);
+                  void navigate({ to: "/" });
+                }}
+              >
+                Remove
+              </Button>
+            </>
+          ) : null}
         </div>
       </header>
 

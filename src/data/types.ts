@@ -77,6 +77,8 @@ export interface Program {
   rosterUnknown?: boolean;
   clippdScrapedAt?: string;
   commits?: RecruitCommit[];
+  custom?: boolean;
+  clippdTeamId?: string;
 }
 
 export type CommitStatus = "verbal" | "signed";

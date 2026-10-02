@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
-import { PROGRAMS } from "@/data/programs";
 import { openingForecast } from "@/lib/model";
+import { useWatchlist } from "@/lib/watchlist";
 import { Badge } from "@/components/ui/badge";
 import { useIntelStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -15,8 +15,9 @@ export function ProgramNav({
   onNavigate?: () => void;
 }) {
   const starred = useIntelStore((s) => s.starred);
-  const d1 = PROGRAMS.filter((p) => p.div === "D1");
-  const d3 = PROGRAMS.filter((p) => p.div === "D3");
+  const programs = useWatchlist();
+  const d1 = programs.filter((p) => p.div === "D1");
+  const d3 = programs.filter((p) => p.div === "D3");
 
   return (
     <nav className="flex flex-col gap-1 px-2 pb-8">
