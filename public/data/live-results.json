@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-10-05T00:01:10.416Z",
+  "scrapedAt": "2026-10-05T14:05:24.317Z",
   "source": "clippd",
   "version": "5.4",
   "teams": {
@@ -1079,7 +1079,7 @@
         }
       ],
       "error": null,
-      "scrapedAt": "2026-10-05T00:00:13.215Z",
+      "scrapedAt": "2026-10-05T14:04:29.274Z",
       "scheduleSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nSouthern Illinois University at Carbondale\nMen\nDivision:\nNCAA Division I\nConference:\nMissouri Valley Conference\nHead Coach:\nJustin Fetcho\nRanking\nRoster\nSchedule\nSeason 2026/2027\nApr 12 - Apr 13, 2027\nEverett Buick GMC Classic\nLittle Rock, Arkansas\nChenal CC - Little Rock - Arkansas\nNCAA Division I\nMen\nLittle Rock\nApr 5 - Apr 6, 2027\nRacer Intercollegiate\nPaducah, KY\nCC Of Paducah - Paducah - KY\nNCAA Division I\nMen\nMurray State\nMar 29 - Mar 31, 2027\nGolfweek Spring Challenge\nPawley's Island, SC\nTrue Blue GC - Pawley's Island - SC\nNCAA Division I\nMen\nGolfweek (Men)\nMar 12 - Mar 14, 2027\nSeminole Intercollegiate\nTallahassee, Florida\nSeminole Legacy GC - Tallahassee - FL\nNCAA Division I\nMen\nFlorida State\nMar 1 - Mar 2, 2027\nSam Ryder Intercollegiate\nDaytona Beach, FL\nLpga International - Daytona Beach - FL\nNCAA Division I\nMen\nStetson\nFeb 22 - Feb 24, 2027\nUniversity of Wyoming Desert Intercollegiate\nPalm Desert, California\nClassic Club - Palm Desert - California\nNCAA Division I\nMen\nWyoming\nOct 26 - Oct 28, 2026\nKa'anapali Classic\nLahaina, HI\nKaanapali GR - Lahaina - HI\nScoreboardLive\nNCAA Division I\nMen\nHawaii\nOct 12 - Oct 13, 2026\nPurdue Fall Invitational\nWest Lafayette, Indiana\nKampen-Cosler Golf Course - West Lafayette\nNCAA Division I\nMen\nPurdue\nSep 27 - Sep 29, 2026\n2026 Badger Invitational\nVerona, Wisconsin\nThe University of Wisconsin Golf Course\nScoreboardLive\nNCAA Division I\nMen\nWisconsin\nSep 21 - Sep 22, 2026\nHighlands Invitational presented by Turtleson\nWestchester, IL\nChicago Highlands - Westchester - IL\nScoreboardLive\nNCAA Division I\nMen\nEast Tennessee State\nSep 14 - Sep 15, 2026\nWildcat Invitational\nManhattan, KS\nColbert Hills GCS - Manhattan - KS\nScoreboardLive\nNCAA Division I\nMen\nKansas State\n\nIn Partnership With\n\nINFORMATION\nNational Collegiate Golf Ranking\nFrequently Asked Questions\nPrivacy Policy\nTerms of Service\nCOMPANY\nAbout us\nPress\nClippd.com\nCONTACT US\n\nClippd USA Ltd\n\nmail: support@clippd.io\n\nFOLLOW US\n "
     },
     "ksu": {
@@ -1104,55 +1104,10 @@
           "teamRounds": [],
           "players": [
             {
-              "name": "AJ Salierno",
-              "team": "Kennesaw State",
-              "role": "team",
-              "finish": "T1",
-              "total": null,
-              "rounds": [
-                null,
-                null,
-                null,
-                null,
-                null
-              ],
-              "toPar": null
-            },
-            {
-              "name": "Alejandro Caraballo",
-              "team": "Kennesaw State",
-              "role": "team",
-              "finish": "T1",
-              "total": null,
-              "rounds": [
-                null,
-                null,
-                null,
-                null,
-                null
-              ],
-              "toPar": null
-            },
-            {
               "name": "James Brash",
               "team": "Kennesaw State",
               "role": "team",
-              "finish": "T1",
-              "total": null,
-              "rounds": [
-                null,
-                null,
-                null,
-                null,
-                null
-              ],
-              "toPar": null
-            },
-            {
-              "name": "Kaiden Drum",
-              "team": "Kennesaw State (IND)",
-              "role": "ind",
-              "finish": "T1",
+              "finish": "T13",
               "total": null,
               "rounds": [
                 null,
@@ -1167,7 +1122,20 @@
               "name": "Luca Gallingani",
               "team": "Kennesaw State",
               "role": "team",
-              "finish": "T1",
+              "finish": "T13",
+              "total": null,
+              "rounds": [
+                null,
+                null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Kaiden Drum",
+              "team": "Kennesaw State (IND)",
+              "role": "ind",
+              "finish": "T13",
               "total": null,
               "rounds": [
                 null,
@@ -1182,11 +1150,35 @@
               "name": "Walker Gantt",
               "team": "Kennesaw State",
               "role": "team",
-              "finish": "T1",
+              "finish": "T69",
               "total": null,
               "rounds": [
                 null,
                 null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "AJ Salierno",
+              "team": "Kennesaw State",
+              "role": "team",
+              "finish": "T69",
+              "total": null,
+              "rounds": [
+                null,
+                null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Alejandro Caraballo",
+              "team": "Kennesaw State",
+              "role": "team",
+              "finish": "T84",
+              "total": null,
+              "rounds": [
                 null,
                 null,
                 null
@@ -1196,7 +1188,7 @@
           ],
           "teamStandings": [],
           "error": null,
-          "rawSnippet": "Back In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Team Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on team screens View: By Stroke # +/- team Total Thru RD1 RD2 RD3 Pts T1 - Western Kentucky - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - VCU - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Eastern Kentucky - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Xavier - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Cincinnati - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Mississippi State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Kentucky - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Tennessee - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - North Alabama - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - West Florida - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - NC State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Iowa State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Memphis - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Penn State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Kennesaw State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18      \n---PLAYER---\nBack In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Player Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on player screens View: By Stroke # +/- player Total Thru RD1 RD2 RD3 Pts T1 - AJ Salierno Kennesaw State - - - - - T1 - AJ Wilhelm Xavier - - - - - T1 - Aidan Wilson Cincinnati - - - - - T1 - Alejandro Caraballo Kennesaw State - - - - - T1 - Alex Creamean Penn State - - - - - T1 - Arth Sinha Mississippi State - - - - - T1 - Arthur Estas North Alabama - - - - - T1 - Ben Wheeler Iowa State - - - - - T1 - Bowen Ballis Vanderbilt (IND) - - - - - T1 - Bradford Lacefield Kentucky (IND) - - - - - T1 - Brayden Miller Cincinnati - - - - - T1 - Bruce Murphy Tennessee (IND) - - - - - T1 - Bryson Hughes Mississippi State - - - - - T1 - Cameron Phillips Kentucky - - - - - T1 - Carlos Astiazaran Vanderbilt (IND) - - - - - T1 - Chase Kyes Tennessee (IND) - - - - - T1 - Chase Nevins Vanderbilt (IND) - - - - - T1 - Christian Morneau Memphis - - - - - T1 - Christian Pardue Tennessee - - - - - T1 - Cole Stockard Kentucky - - - - - T1 - Colton Woosley Western Kentucky - - - - - T1 - Dianchao Wu Iowa State - - - - - T1 - Diego Do Patrocinio Lourenco Memphis - - - - - T1 - Eli Wessel Cincinnati (IND) - - - - - T1 - Ethan Parish West Florida - - - - - T1 - Ethan Weinberg West Florida - - - - - T1 - Finn Burkholder Mississippi State - - - - - T1 - Gabriel Hull Kentucky - - - - - T1 - Gage Doyle Western Kentucky - - - - - T1 - Gavin Clutts Kentucky (IND) - - - - - T1 - Gavin Isbell Mississippi State - - - - - T1 - Harper Ackermann West Florida - - - - - T1 - Hector Arriaga West Florida - - - - - T1 - Hristo Yanakiev Eastern Kentucky - - - - - T1 - Hunter Stetson NC State - - - - - T1 - Jack Morris North Alabama - - - - - T1 - Jackson Herrington Tennessee - - - - - T1 - Jackson McCommom Iowa State - - - - - T1 - Jackson Saroney Penn State - - - - - T1 - Jackson Skinner Mississippi State (IND) - - - - - T1 - Jacob Lang Kentucky - - - - - T1 - Jacob Settles Kentucky - - - - - T1 - James Brash Kennesaw State - - - - - T1 - Jameson Corbin Eastern Kentucky - - - - - T1 - Jedd Brady North Alabama - - - - - T1 - Jesse Trembath Iowa State - - - - - T1 - John Curran Penn State - - - - - T1 - John Logan NC State - - - - - T1 - Jonathan Ericsson Eastern Kentucky - - - - - T1 - Kaiden Drum Kennesaw State (IND) - - - - - T1 - Kellen Dean Xavier - - - - - T1 - Leo Walling Xavier - - - - - T1 - Leo Wessel Cincinnati - - - - - T1 - Luca Gallingani Kennesaw State - - - - - T1 - Lucas Latimer North Alabama - - - - - T1 - Luke Coyle Kentucky (IND) - - - - - T1 - Luke Smith Tennessee (IND) - - - - - T1 - Luke Stennett Memphis - - - - - T1 - Max Morgenstern VCU - - - - - T1 - North Chery VCU - - - - - T1 - Owen Sawyer Iowa State - - - - - T1 - Pearce Lewin NC State - - - - - T1 - Pennson Badgett Tennessee - - - - - T1 - Preston Severs West Florida - - - - - T1 - Rafe Blankenship Western Kentucky - - - - - T1 - Rami Samawi VCU - - - - - T1 - Ray Filter Xavier - - - - - T1 - Rudy Sautron Tennessee - - - - - T1 - Ryan Downes Vanderbilt (IND) - - - - - T1 - Ryan Ford Cincinnati - - - - - T1 - Rylan Shim NC State - - - - - T1 - Tanner Cadieux VCU - - - - - T1 - Theophile Archer VCU - - - - - T1 - Tim P",
+          "rawSnippet": "Back In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Team Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on team screens View: By Stroke # +/- team Total Thru RD1 RD2 RD3 Pts T1 - Xavier 20 0-3 20 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - North Alabama 25 0-3 25 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T3 - Cincinnati 11 0-2 11 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T3 - Mississippi State 11 0-2 11 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - West Florida 23 0-3 23 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Western Kentucky 23 0-3 23 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - VCU 22 0-3 22 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Penn State 27 0-3 27 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Tennessee 12 0-2 12 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Eastern Kentucky 23 0-3 23 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Kentucky 4 0-2 4 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Iowa State 31 1-3 31 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T13 - Memphis 36 1-3 36 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T13 - NC State 33 1-3 33 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       15 - Kennesaw State 34 1-3 34 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18      \n---PLAYER---\nBack In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Player Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on player screens View: By Stroke # +/- player Total Thru RD1 RD2 RD3 Pts 1 - Eli Wessel Cincinnati (IND) 11 3 11 - - - T2 - Arthur Estas North Alabama 12 3 12 - - - T2 - Jameson Corbin Eastern Kentucky 12 3 12 - - - T2 - Kellen Dean Xavier 12 3 12 - - - T2 - Bradford Lacefield Kentucky (IND) 8 2 8 - - - T2 - Jedd Brady North Alabama 8 2 8 - - - T2 - Timmy Hollenbeck Cincinnati 7 2 7 - - - T2 - Bryson Hughes Mississippi State 3 1 3 - - - T2 - Carlos Astiazaran Vanderbilt (IND) 4 1 4 - - - T2 - Chase Kyes Tennessee (IND) 4 1 4 - - - T2 - Gavin Clutts Kentucky (IND) 4 1 4 - - - T2 - Leo Walling Xavier 4 1 4 - - - T13 - Gage Doyle Western Kentucky 13 3 13 - - - T13 - Hector Arriaga West Florida 13 3 13 - - - T13 - Jackson Saroney Penn State 13 3 13 - - - T13 - James Brash Kennesaw State 12 3 12 - - - T13 - Jesse Trembath Iowa State 12 3 12 - - - T13 - John Logan NC State 12 3 12 - - - T13 - Theophile Archer VCU 13 3 13 - - - T13 - Tobey Kim Memphis 12 3 12 - - - T13 - Bowen Ballis Vanderbilt (IND) 7 2 7 - - - T13 - Christian Morneau Memphis 7 2 7 - - - T13 - Dianchao Wu Iowa State 7 2 7 - - - T13 - Diego Do Patrocinio Lourenco Memphis 8 2 8 - - - T13 - Finn Burkholder Mississippi State 8 2 8 - - - T13 - Hristo Yanakiev Eastern Kentucky 7 2 7 - - - T13 - John Curran Penn State 9 2 9 - - - T13 - Luca Gallingani Kennesaw State 8 2 8 - - - T13 - Owen Sawyer Iowa State 8 2 8 - - - T13 - Pearce Lewin NC State 8 2 8 - - - T13 - Preston Severs West Florida 7 2 7 - - - T13 - Rudy Sautron Tennessee 8 2 8 - - - T13 - Ryan Downes Vanderbilt (IND) 9 2 9 - - - T13 - Rylan Shim NC State 8 2 8 - - - T13 - William Easterlin Western Kentucky 7 2 7 - - - T13 - Ben Wheeler Iowa State 4 1 4 - - - T13 - Brayden Miller Cincinnati 4 1 4 - - - T13 - Bruce Murphy Tennessee (IND) 5 1 5 - - - T13 - Cameron Phillips Kentucky 4 1 4 - - - T13 - Chase Nevins Vanderbilt (IND) 3 1 3 - - - T13 - Ethan Parish West Florida 3 1 3 - - - T13 - Pennson Badgett Tennessee 4 1 4 - - - T13 - Rafe Blankenship Western Kentucky 3 1 3 - - - T13 - Rami Samawi VCU 5 1 5 - - - T13 - Ray Filter Xavier 4 1 4 - - - T13 - Tanner Cadieux VCU 4 1 4 - - - T13 - Will Hindemit North Alabama 5 1 5 - - - T13 - Will Preston Penn State 5 1 5 - - - T13 - AJ Wilhelm Xavier - - - - - T13 - Aidan Wilson Cincinnati - - - - - T13 - Arth Sinha Mississippi State - - - - - T13 - Christian Pardue Tennessee - - - - - T13 - Cole Stockard Kentucky - - - - - T13 - Colton Woosley Western Kentucky - - - - - T13 - Gavin Isbell Mississippi State - - - - - T13 - Harper Ackermann West Florida - - - - - T13 - Jack Morris North Alabama - - - - - T13 - Jackson Herrington Tennessee - - - - - T13 - Jacob Lang Kentucky - - - - - T13 - Jacob Settles Kentucky - - - - - T13 - Kaiden Drum Kennesaw State (IND) - - - - - T13 - Leo Wessel Cincinnati - - - - - T13 - Max Morgenstern VCU - - - - - T13 - Ryan Ford Cincinnati - - - - - T13 - Tim Peters Penn State - - - - - T13 - Tucker Jones Eastern Kentucky - - - - - T13 - Tyler Watts Tennessee - - - - - T13 - Yago Horno Mateo Mississippi State - - - - - T69 - Luke Coyle Kentucky (IND) 14 3 14 - - - T69 -",
           "fetchMode": "http-stroke",
           "division": "NCAA Division I"
         },
@@ -2025,7 +2017,7 @@
         }
       ],
       "error": null,
-      "scrapedAt": "2026-10-05T00:00:22.381Z",
+      "scrapedAt": "2026-10-05T14:04:39.747Z",
       "scheduleSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nKennesaw State University\nMen\nDivision:\nNCAA Division I\nConference:\nConference USA\nHead Coach:\nBryant Odom\nRanking\nRoster\nSchedule\nSeason 2026/2027\nApr 29, 2027\n2027 Conference USA Men's Golf Championship - Match Play\nPearland, Texas\nGolfcrest Country Club\nNCAA Division I\nMen\nConference USA (Men)\nApr 26 - Apr 28, 2027\n2027 CUSA Men's Golf Championship - Stroke Play\nPearland, Texas\nGolfcrest Country Club\nNCAA Division I\nMen\nConference USA (Men)\nApr 10 - Apr 11, 2027\nTar Heel Intercollegiate\nChapel Hill, NC\nFinley GC - Chapel Hill - NC\nNCAA Division I\nMen\nNorth Carolina\nMar 19 - Mar 21, 2027\nLinger Longer Invitational\nEatonton, Georgia\nGreat Waters at Reynolds Lake Oconee - Eatonton - Georgia\nNCAA Division I\nMen\nKennesaw State\nMar 1 - Mar 2, 2027\nSam Ryder Intercollegiate\nDaytona Beach, FL\nLpga International - Daytona Beach - FL\nNCAA Division I\nMen\nStetson\nFeb 7 - Feb 9, 2027\nDorado Beach Collegiate\nDORADO, PR\nTpc Dorado Beach - DORADO - PR\nScoreboardLive\nNCAA Division I\nMen\nUNCG\nFeb 1 - Feb 2, 2027\nSeaBest Invitational\nAtlantic Beach, FL\nAtlantic Beach CC\nNCAA Division I\nMen\nJacksonville\nOct 31 - Nov 1, 2026\nSteelwood Collegiate\nLoxley, Alabama\nSteelwood GC - Loxley - Alabama\nNCAA Division I\nMen\nSouth Alabama\nOct 12 - Oct 13, 2026\nThe Scrappy at Pinetree\nKennesaw, Georgia\nPinetree CC - Kennesaw - Georgia\nNCAA Division I\nMen\nKennesaw State\nOct 5 - Oct 6, 2026\nCullan Brown Collegiate\nLexington, Kentucky\nLexington CC - Lexington - Kentucky\nScoreboardLive\nNCAA Division I\nMen\nKentucky\nSep 13 - Sep 15, 2026\nJT Poston Invitational\nWaynesville, NC\nWaynesville Inn and Golf Club - Waynesville - NC\nScoreboardLive\nNCAA Division I\nMen\nWestern Carolina\nSep 6 - Sep 8, 2026\nMyrtle Beach Golf Trips Intercollegiate\nMyrtle Beach, South Carolina\nThe Grande Dunes Resort Club - Myrtle Beach - South Carolina\nScoreboardLive\nNCAA Division I\nMen\nCoastal Carolina\nLoad more\n\nIn Partnership With\n\nINFORMATION\nNational Collegiate Golf Ranking\nFrequently Asked Questions\nPrivacy Policy\nTerms of Service\nCOMPANY\nAbout us\nPress\nClippd.com\nCONTACT US\n\nClippd USA Ltd\n\nmail: support@clippd.io\n\nFOLLOW US\n "
     },
     "shu": {
@@ -2043,15 +2035,93 @@
           "name": "Nemacolin Collegiate Invitational",
           "dates": "Oct 5 - Oct 6, 2026",
           "venue": "Nemacolin Woodlands Resort - Farmington - Pennsylvania",
-          "status": "unknown",
+          "status": "live",
           "teamPlace": null,
           "teamTotal": null,
           "teamToPar": null,
           "teamRounds": [],
-          "players": [],
+          "players": [
+            {
+              "name": "Isaiah Williams",
+              "team": "Seton Hall",
+              "role": "team",
+              "finish": "T19",
+              "total": null,
+              "rounds": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Will Hennessee",
+              "team": "Seton Hall",
+              "role": "team",
+              "finish": "T38",
+              "total": null,
+              "rounds": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Blake Goodnight",
+              "team": "Seton Hall",
+              "role": "team",
+              "finish": "T38",
+              "total": null,
+              "rounds": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Luke Nolan",
+              "team": "Seton Hall",
+              "role": "team",
+              "finish": "T64",
+              "total": null,
+              "rounds": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Dylan Holmes",
+              "team": "Seton Hall",
+              "role": "team",
+              "finish": "87",
+              "total": 88,
+              "rounds": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                88,
+                null
+              ],
+              "toPar": null
+            }
+          ],
           "teamStandings": [],
           "error": null,
-          "rawSnippet": "Back In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Nemacolin Collegiate Invitational (Men) Team Leaderboard Men ScoreboardLive Men ScoreboardLive Nemacolin Collegiate Invitational Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : West Virginia Division : NCAA Division I Partic. Times Team Player Stats Participants Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : West Virginia Division : NCAA Division I Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania * Divisional points displayed on team screens View: By Stroke # +/- team Total Thru RD1 RD2 RD3 Pts This tournament is using ScoreboardLive. Results will appear once the tournament commences play.\n---PLAYER---\nBack In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Nemacolin Collegiate Invitational (Men) Player Leaderboard Men ScoreboardLive Men ScoreboardLive Nemacolin Collegiate Invitational Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : West Virginia Division : NCAA Division I Partic. Times Team Player Stats Participants Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : West Virginia Division : NCAA Division I Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania * Divisional points displayed on player screens View: By Stroke # +/- player Total Thru RD1 RD2 RD3 Pts This tournament is using ScoreboardLive. Results will appear once the tournament commences play.",
+          "rawSnippet": "Back In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Nemacolin Collegiate Invitational (Men) Team Leaderboard Men ScoreboardLive Men ScoreboardLive Nemacolin Collegiate Invitational Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : West Virginia Division : NCAA Division I Scoring System : Player Walking Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : West Virginia Division : NCAA Division I Scoring System : Player Walking Scoring Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania * Divisional points displayed on team screens View: By Stroke # +/- team Total Thru RD1 RD2 RD3 Pts 1 - Connecticut 77 5-6 77 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       2 - George Washington 80 5-6 80 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T3 - Eastern Michigan 64 4 64 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T3 - George Mason 68 4-6 68 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T3 - West Virginia 76 4-6 76 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       6 - St. John&#x27;s 57 3-4 57 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T7 - Drexel 59 2-5 59 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T7 - Campbell 67 4 67 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       9 - William &amp; Mary 86 5-6 86 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       10 - Robert Morris 78 4-5 78 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T11 - Saint Joseph&#x27;s (PA) 79 4-5 79 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T11 - Rider 92 5-6 92 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T11 - Seton Hall 62 2-5 62 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       14 - Towson 93 5-6 93 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T15 - Delaware 67 3-4 67 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T15 - Murray State 92 5-6 92 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18      \n---PLAYER---\nBack In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Nemacolin Collegiate Invitational (Men) Player Leaderboard Men ScoreboardLive Men ScoreboardLive Nemacolin Collegiate Invitational Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : West Virginia Division : NCAA Division I Scoring System : Player Walking Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : West Virginia Division : NCAA Division I Scoring System : Player Walking Scoring Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania Venue : Nemacolin Woodlands Resort - Farmington - Pennsylvania * Divisional points displayed on player screens View: By Stroke # +/- player Total Thru RD1 RD2 RD3 Pts 1 - Maxime Lam George Washington 16 5 16 - - - 2 - Kai Jun Huang Connecticut 16 5 16 - - - T3 - Matthew Costello Connecticut 19 5 19 - - - T3 - Nicholas Turowski West Virginia 18 5 18 - - - T3 - Philipp Krone George Mason 18 5 18 - - - T3 - Arsit Areephun Eastern Michigan 15 4 15 - - - T7 - Luke Walmet William &amp; Mary 22 6 22 - - - T7 - Patricio Gonzalez George Washington 22 6 22 - - - T7 - Brody Burgess West Virginia (IND) 18 5 18 - - - T7 - Hampton Beebe Auburn (IND) 18 5 18 - - - T7 - Lennon Albans Murray State 19 5 19 - - - T7 - Luca Kleinschmidt Drexel 19 5 19 - - - T7 - Aryan Vuradi George Mason 14 4 14 - - - T7 - Ben Skripac Robert Morris 14 4 14 - - - T7 - Curro Martinez St. John&#x27;s 15 4 15 - - - T7 - Erik Johansson Campbell 15 4 15 - - - T7 - Jack Michael West Virginia 14 4 14 - - - T7 - Max McColgan St. John&#x27;s 12 3 12 - - - T19 - Derek Johnson Towson 24 6 24 - - - T19 - Justin Burroughs Connecticut 23 6 23 - - - T19 - Nathan Tallinder Rider 24 6 24 - - - T19 - Ryan Leach West Virginia 23 6 23 - - - T19 - Chuck Tragesser Robert Morris 20 5 20 - - - T19 - Evan Eichenlaub George Washington 20 5 20 - - - T19 - George Williamson Jr. Saint Joseph&#x27;s (PA) 20 5 20 - - - T19 - Isaiah Williams Seton Hall 20 5 20 - - - T19 - Jules De Reu Rider 20 5 20 - - - T19 - Landon Hunt Murray State 20 5 20 - - - T19 - Smith Summerlin Auburn (IND) 19 5 19 - - - T19 - Yves Koller Connecticut 19 5 19 - - - T19 - Charlie Box Eastern Michigan 17 4 17 - - - T19 - Eli Weidmann St. John&#x27;s 16 4 16 - - - T19 - Joachim Larsen Tegner Campbell 17 4 17 - - - T19 - Parin Sarasmut Eastern Michigan 16 4 16 - - - T19 - Sivawong Aukrawat George Mason 15 4 15 - - - T19 - Vicente Quiroga Eastern Michigan 16 4 16 - - - T19 - John Stevenson Drexel 9 2 9 - - - T38 - Ariihau Faana Towson 25 6 25 - - - T38 - Aidan Dortch West Virginia 21 5 21 - - - T38 - Brennan Korn Connecticut 22 5 22 - - - T38 - Chase Bokker Robert Morris 21 5 21 - - - T38 - Eli Felty William &amp; Mary 20 5 20 - - - T38 - Harrison Thompson West Virginia (IND) 20 5 20 - - - T38 - John Keba Drexel 21 5 21 - - - T38 - Major Ewing West Virginia (IND) 20 5 20 - - - T38 - Michael Henry Jr. Saint Joseph&#x27;s (PA) 21 5 21 - - - T38 - Michael Shivers West Virginia (IND) 20 5 20 - - - T38 - Noah Moelter Saint Joseph&#x27;s (PA) 21 5 21 - - - T38 - Nontaphat Veeratecha Rider 21 5 21 - - - T38 - Preston Burton William &amp; Mary 22 5 22 - - - T38 - Tyler Spielman Auburn (IND) 20 5 20 - - - T38 - Vijay Powell George Mason 21 5 21 - - - T38 - Whitty Richardson William &amp; Mary 22 5 22 - - - T38 - Will Hennessee Seton Hall 21 5 21 - - - T38 - Guillermo Ochoa Valencia Campbell 18 4 18 - - - T38 - Hogan Blais West Virginia 16 4 16 - - - T38 - Joshua Hess Eastern Michigan 17 4 17 - - - T38 - Logan Graf Campbell 17 4 17 - - - T38 - Matthew Homer Delaware 17 4 17 - - - T38 - Josh Yan St. John&#x27;s 14 3 14 - - - T38 - Pasit Iampongsai Delaware 14 3 14 - - - T38 - ",
           "fetchMode": "http-stroke",
           "division": "NCAA Division I"
         },
@@ -2992,8 +3062,8 @@
           "dates": "Oct 5 - Oct 6, 2026",
           "city": "Farmington, Pennsylvania",
           "venue": "Nemacolin Woodlands Resort - Farmington - Pennsylvania",
-          "scoreboardLive": false,
-          "hasResults": false,
+          "scoreboardLive": true,
+          "hasResults": true,
           "isComplete": false,
           "division": "NCAA Division I",
           "start": "2026-10-05T00:00:00.000Z",
@@ -3045,7 +3115,7 @@
         }
       ],
       "error": null,
-      "scrapedAt": "2026-10-05T00:00:30.429Z",
+      "scrapedAt": "2026-10-05T14:04:46.454Z",
       "scheduleSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nSeton Hall University\nMen\nDivision:\nNCAA Division I\nConference:\nBig East Conference\nHead Coach:\nJT Harper\nRanking\nRoster\nSchedule\nSeason 2026/2027\nMay 1 - May 3, 2027\n2027 BIG EAST Men's Golf Championship\nOkatie, SC\nCallawassie Island Club - Okatie - SC\nNCAA Division I\nMen\nBig East Conference (Men)\nApr 17 - Apr 18, 2027\nRutgers Invitational\nBedminster, New Jersey\nTrump National GC at Bedminster - Bedminster - New Jersey\nNCAA Division I\nMen\nRutgers\nApr 10 - Apr 11, 2027\nPrinceton Invitational\nPrinceton, NJ\nSpringdale GC - Princeton - NJ\nNCAA Division I\nMen\nPrinceton\nApr 5 - Apr 6, 2027\nWildcat Spring Invitational\nGalloway Township, New Jersey\nGalloway National GC - Galloway Township - New Jersey\nNCAA Division I\nMen\nVillanova\nMar 15 - Mar 16, 2027\nTiger Invitational\nAuburn, Alabama\nAuburn University Club - Auburn - Alabama\nNCAA Division I\nMen\nAuburn\nMar 8 - Mar 10, 2027\nBabygrande Donald Ross Collegiate\nSouthern Pines, NC\nMid Pines Club - Southern Pines - NC\nBabygrande\nNCAA Division I\nMen\nGeorge Mason\nFeb 8 - Feb 9, 2027\n2027 Big East Match Play Championship\nWest Palm Beach, FL\nBear Lakes CC - West Palm Beach - FL\nNCAA Division I\nMen\nConnecticut\nOct 12 - Oct 14, 2026\nThe Bryson Invitational\nMiami, Florida\nTrump National Doral Miami - Miami - Florida\nNCAA Division I\nMen\nCharleston\nOct 5 - Oct 6, 2026\nNemacolin Collegiate Invitational\nFarmington, Pennsylvania\nNemacolin Woodlands Resort - Farmington - Pennsylvania\nScoreboardLive\nNCAA Division I\nMen\nWest Virginia\nSep 25 - Sep 26, 2026\n48th Macdonald Cup\nNew Haven, CT\nYale GCS - New Haven - CT\nScoreboardLive\nNCAA Division I\nMen\nYale\nSep 14 - Sep 15, 2026\nRedHawk Intercollegiate\nPittsburgh, PA\nPittsburgh Field Club - Pittsburgh - PA\nScoreboardLive\nNCAA Division I\nMen\nMiami (OH)\nSep 5 - Sep 6, 2026\n10th Alex Lagowitz Memorial\nHamilton, New York\nSeven Oaks GC - Hamilton - New York\nScoreboardLive\nNCAA Division I\nMen\nColgate\nLoad more\n\nIn Partnership With\n\nINFORMATION\nNational Collegiate Golf Ranking\nFrequently Asked Questions\nPrivacy Policy\nTerms of Service\nCOMPANY\nAbout us\nPress\nClippd.com\nCONTACT US\n\nClippd USA Ltd\n\nmail: support@clippd.io\n\nFOLLOW US\n "
     },
     "ucsb": {
@@ -4192,7 +4262,7 @@
         }
       ],
       "error": null,
-      "scrapedAt": "2026-10-05T00:00:39.488Z",
+      "scrapedAt": "2026-10-05T14:04:55.833Z",
       "scheduleSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nUniversity of California, Santa Barbara\nMen\nDivision:\nNCAA Division I\nConference:\nBig West Conference\nHead Coach:\nChris Massoletti\nRanking\nRoster\nSchedule\nSeason 2026/2027\nMay 2 - May 4, 2027\n2027 Big West Men's Golf Championship\nLa Quinta , California\nLa Quinta Country Club\nNCAA Division I\nMen\nBig West Conference (Men)\nApr 10 - Apr 11, 2027\nAggie Invitational\nBryan, Texas\nTraditions Club at Texas A&M - Bryan - Texas\nNCAA Division I\nMen\nTexas A&M\nApr 5 - Apr 6, 2027\nUCSB Gaucho Invite\nSanta Barbara, California\nSandpiper GC - Santa Barbara - California\nNCAA Division I\nMen\nUC Santa Barbara\nMar 22 - Mar 23, 2027\nAdmired Leadership Bruin Invitational\nValencia, CA\nValencia CC - Valencia - CA\nNCAA Division I\nMen\nUCLA\nMar 8 - Mar 9, 2027\nR.E. Lamkin Invitational\nSan Diego, CA\nThe Grand GC - San Diego - CA\nNCAA Division I\nMen\nSan Diego\nMar 1 - Mar 2, 2027\nThe Watney Invitational\nFresno, CA\nSunnyside CC - Fresno - CA\nNCAA Division I\nMen\nFresno State\nFeb 22 - Feb 24, 2027\nUniversity of Wyoming Desert Intercollegiate\nPalm Desert, California\nClassic Club - Palm Desert - California\nNCAA Division I\nMen\nWyoming\nOct 12 - Oct 14, 2026\nVisit Stockton Pacific Invitational\nStockton, California\nThe Reserve at Spanos Park - Stockton - California\nNCAA Division I\nMen\nPacific\nOct 5 - Oct 6, 2026\nTMU Danish Classic 2026\nSolvang, California\nAlisal Guest Ranch & Resort - Solvang - California\nScoreboardLive\nNAIA\nMen\nMaster's\nSep 25 - Sep 26, 2026\nWilliam H. Tucker Invitational\nAlbuquerque, New Mexico\nUniversity of New Mexico - Albuquerque - New Mexico\nScoreboardLive\nNCAA Division I\nMen\nNew Mexico\nSep 19 - Sep 21, 2026\nGene Miranda Invitational\nColorado Springs, CO\nEisenhower GC - Colorado Springs - CO\nScoreboardLive\nNCAA Division I\nMen\nAir Force\nSep 19 - Sep 21, 2026\nAir Force Individual\nColorado Springs, CO\nEisenhower GC - Colorado Springs - CO\nScoreboardLive\nNCAA Division I\nMen\nAir Force\nLoad more\n\nIn Partnership With\n\nINFORMATION\nNational Collegiate Golf Ranking\nFrequently Asked Questions\nPrivacy Policy\nTerms of Service\nCOMPANY\nAbout us\nPress\nClippd.com\nCONTACT US\n\nClippd USA Ltd\n\nmail: support@clippd.io\n\nFOLLOW US\n "
     },
     "memphis": {
@@ -4217,14 +4287,27 @@
           "teamRounds": [],
           "players": [
             {
-              "name": "Christian Morneau",
+              "name": "Tobey Kim",
               "team": "Memphis",
               "role": "team",
-              "finish": "T1",
+              "finish": "T13",
               "total": null,
               "rounds": [
                 null,
                 null,
+                null,
+                null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Christian Morneau",
+              "team": "Memphis",
+              "role": "team",
+              "finish": "T13",
+              "total": null,
+              "rounds": [
                 null,
                 null,
                 null
@@ -4235,41 +4318,9 @@
               "name": "Diego Do Patrocinio Lourenco",
               "team": "Memphis",
               "role": "team",
-              "finish": "T1",
+              "finish": "T13",
               "total": null,
               "rounds": [
-                null,
-                null,
-                null,
-                null,
-                null
-              ],
-              "toPar": null
-            },
-            {
-              "name": "Luke Stennett",
-              "team": "Memphis",
-              "role": "team",
-              "finish": "T1",
-              "total": null,
-              "rounds": [
-                null,
-                null,
-                null,
-                null,
-                null
-              ],
-              "toPar": null
-            },
-            {
-              "name": "Tobey Kim",
-              "team": "Memphis",
-              "role": "team",
-              "finish": "T1",
-              "total": null,
-              "rounds": [
-                null,
-                null,
                 null,
                 null,
                 null
@@ -4280,11 +4331,22 @@
               "name": "Yixiang Wang",
               "team": "Memphis",
               "role": "team",
-              "finish": "T1",
+              "finish": "T69",
               "total": null,
               "rounds": [
                 null,
                 null,
+                null
+              ],
+              "toPar": null
+            },
+            {
+              "name": "Luke Stennett",
+              "team": "Memphis",
+              "role": "team",
+              "finish": "T69",
+              "total": null,
+              "rounds": [
                 null,
                 null,
                 null
@@ -4294,7 +4356,7 @@
           ],
           "teamStandings": [],
           "error": null,
-          "rawSnippet": "Back In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Team Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on team screens View: By Stroke # +/- team Total Thru RD1 RD2 RD3 Pts T1 - Western Kentucky - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - VCU - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Eastern Kentucky - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Xavier - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Cincinnati - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Mississippi State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Kentucky - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Tennessee - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - North Alabama - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - West Florida - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - NC State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Iowa State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Memphis - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Penn State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - Kennesaw State - - - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18      \n---PLAYER---\nBack In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Player Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on player screens View: By Stroke # +/- player Total Thru RD1 RD2 RD3 Pts T1 - AJ Salierno Kennesaw State - - - - - T1 - AJ Wilhelm Xavier - - - - - T1 - Aidan Wilson Cincinnati - - - - - T1 - Alejandro Caraballo Kennesaw State - - - - - T1 - Alex Creamean Penn State - - - - - T1 - Arth Sinha Mississippi State - - - - - T1 - Arthur Estas North Alabama - - - - - T1 - Ben Wheeler Iowa State - - - - - T1 - Bowen Ballis Vanderbilt (IND) - - - - - T1 - Bradford Lacefield Kentucky (IND) - - - - - T1 - Brayden Miller Cincinnati - - - - - T1 - Bruce Murphy Tennessee (IND) - - - - - T1 - Bryson Hughes Mississippi State - - - - - T1 - Cameron Phillips Kentucky - - - - - T1 - Carlos Astiazaran Vanderbilt (IND) - - - - - T1 - Chase Kyes Tennessee (IND) - - - - - T1 - Chase Nevins Vanderbilt (IND) - - - - - T1 - Christian Morneau Memphis - - - - - T1 - Christian Pardue Tennessee - - - - - T1 - Cole Stockard Kentucky - - - - - T1 - Colton Woosley Western Kentucky - - - - - T1 - Dianchao Wu Iowa State - - - - - T1 - Diego Do Patrocinio Lourenco Memphis - - - - - T1 - Eli Wessel Cincinnati (IND) - - - - - T1 - Ethan Parish West Florida - - - - - T1 - Ethan Weinberg West Florida - - - - - T1 - Finn Burkholder Mississippi State - - - - - T1 - Gabriel Hull Kentucky - - - - - T1 - Gage Doyle Western Kentucky - - - - - T1 - Gavin Clutts Kentucky (IND) - - - - - T1 - Gavin Isbell Mississippi State - - - - - T1 - Harper Ackermann West Florida - - - - - T1 - Hector Arriaga West Florida - - - - - T1 - Hristo Yanakiev Eastern Kentucky - - - - - T1 - Hunter Stetson NC State - - - - - T1 - Jack Morris North Alabama - - - - - T1 - Jackson Herrington Tennessee - - - - - T1 - Jackson McCommom Iowa State - - - - - T1 - Jackson Saroney Penn State - - - - - T1 - Jackson Skinner Mississippi State (IND) - - - - - T1 - Jacob Lang Kentucky - - - - - T1 - Jacob Settles Kentucky - - - - - T1 - James Brash Kennesaw State - - - - - T1 - Jameson Corbin Eastern Kentucky - - - - - T1 - Jedd Brady North Alabama - - - - - T1 - Jesse Trembath Iowa State - - - - - T1 - John Curran Penn State - - - - - T1 - John Logan NC State - - - - - T1 - Jonathan Ericsson Eastern Kentucky - - - - - T1 - Kaiden Drum Kennesaw State (IND) - - - - - T1 - Kellen Dean Xavier - - - - - T1 - Leo Walling Xavier - - - - - T1 - Leo Wessel Cincinnati - - - - - T1 - Luca Gallingani Kennesaw State - - - - - T1 - Lucas Latimer North Alabama - - - - - T1 - Luke Coyle Kentucky (IND) - - - - - T1 - Luke Smith Tennessee (IND) - - - - - T1 - Luke Stennett Memphis - - - - - T1 - Max Morgenstern VCU - - - - - T1 - North Chery VCU - - - - - T1 - Owen Sawyer Iowa State - - - - - T1 - Pearce Lewin NC State - - - - - T1 - Pennson Badgett Tennessee - - - - - T1 - Preston Severs West Florida - - - - - T1 - Rafe Blankenship Western Kentucky - - - - - T1 - Rami Samawi VCU - - - - - T1 - Ray Filter Xavier - - - - - T1 - Rudy Sautron Tennessee - - - - - T1 - Ryan Downes Vanderbilt (IND) - - - - - T1 - Ryan Ford Cincinnati - - - - - T1 - Rylan Shim NC State - - - - - T1 - Tanner Cadieux VCU - - - - - T1 - Theophile Archer VCU - - - - - T1 - Tim P",
+          "rawSnippet": "Back In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Team Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on team screens View: By Stroke # +/- team Total Thru RD1 RD2 RD3 Pts T1 - Xavier 20 0-3 20 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T1 - North Alabama 25 0-3 25 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T3 - Cincinnati 11 0-2 11 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T3 - Mississippi State 11 0-2 11 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - West Florida 23 0-3 23 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Western Kentucky 23 0-3 23 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - VCU 22 0-3 22 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Penn State 27 0-3 27 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Tennessee 12 0-2 12 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Eastern Kentucky 23 0-3 23 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Kentucky 4 0-2 4 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T5 - Iowa State 31 1-3 31 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T13 - Memphis 36 1-3 36 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       T13 - NC State 33 1-3 33 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18       15 - Kennesaw State 34 1-3 34 - - - Round 1 Total Current Round 1 2 3 4 5 6 7 8 9   10 11 12 13 14 15 16 17 18      \n---PLAYER---\nBack In Partnership With Home Tournaments Rankings Teams &amp; Players News Live Streams Coach Portal In Partnership With In Partnership With In Partnership With Information National Collegiate Golf Ranking Frequently Asked Questions Privacy Policy Terms of Service Company About us Press Clippd.com Contact Us Clippd USA Ltd mail: support@clippd.io Follow Us SCOREBOARD - Cullan Brown Collegiate (Men) Player Leaderboard Men ScoreboardLive Men ScoreboardLive Cullan Brown Collegiate Oct 5 - Oct 6, 2026 Date Generated: Oct 5, 2026 Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Times Team Player Stats Tee Times Team Leaderboard Player Leaderboard Stats Hosted By : Kentucky Division : NCAA Division I Scoring System : Greenside Scoring Venue : Lexington CC - Lexington - Kentucky Venue : Lexington CC - Lexington - Kentucky * Divisional points displayed on player screens View: By Stroke # +/- player Total Thru RD1 RD2 RD3 Pts 1 - Eli Wessel Cincinnati (IND) 11 3 11 - - - T2 - Arthur Estas North Alabama 12 3 12 - - - T2 - Jameson Corbin Eastern Kentucky 12 3 12 - - - T2 - Kellen Dean Xavier 12 3 12 - - - T2 - Bradford Lacefield Kentucky (IND) 8 2 8 - - - T2 - Jedd Brady North Alabama 8 2 8 - - - T2 - Timmy Hollenbeck Cincinnati 7 2 7 - - - T2 - Bryson Hughes Mississippi State 3 1 3 - - - T2 - Carlos Astiazaran Vanderbilt (IND) 4 1 4 - - - T2 - Chase Kyes Tennessee (IND) 4 1 4 - - - T2 - Gavin Clutts Kentucky (IND) 4 1 4 - - - T2 - Leo Walling Xavier 4 1 4 - - - T13 - Gage Doyle Western Kentucky 13 3 13 - - - T13 - Hector Arriaga West Florida 13 3 13 - - - T13 - Jackson Saroney Penn State 13 3 13 - - - T13 - James Brash Kennesaw State 12 3 12 - - - T13 - Jesse Trembath Iowa State 12 3 12 - - - T13 - John Logan NC State 12 3 12 - - - T13 - Theophile Archer VCU 13 3 13 - - - T13 - Tobey Kim Memphis 12 3 12 - - - T13 - Bowen Ballis Vanderbilt (IND) 7 2 7 - - - T13 - Christian Morneau Memphis 7 2 7 - - - T13 - Dianchao Wu Iowa State 7 2 7 - - - T13 - Diego Do Patrocinio Lourenco Memphis 8 2 8 - - - T13 - Finn Burkholder Mississippi State 8 2 8 - - - T13 - Hristo Yanakiev Eastern Kentucky 7 2 7 - - - T13 - John Curran Penn State 9 2 9 - - - T13 - Luca Gallingani Kennesaw State 8 2 8 - - - T13 - Owen Sawyer Iowa State 8 2 8 - - - T13 - Pearce Lewin NC State 8 2 8 - - - T13 - Preston Severs West Florida 7 2 7 - - - T13 - Rudy Sautron Tennessee 8 2 8 - - - T13 - Ryan Downes Vanderbilt (IND) 9 2 9 - - - T13 - Rylan Shim NC State 8 2 8 - - - T13 - William Easterlin Western Kentucky 7 2 7 - - - T13 - Ben Wheeler Iowa State 4 1 4 - - - T13 - Brayden Miller Cincinnati 4 1 4 - - - T13 - Bruce Murphy Tennessee (IND) 5 1 5 - - - T13 - Cameron Phillips Kentucky 4 1 4 - - - T13 - Chase Nevins Vanderbilt (IND) 3 1 3 - - - T13 - Ethan Parish West Florida 3 1 3 - - - T13 - Pennson Badgett Tennessee 4 1 4 - - - T13 - Rafe Blankenship Western Kentucky 3 1 3 - - - T13 - Rami Samawi VCU 5 1 5 - - - T13 - Ray Filter Xavier 4 1 4 - - - T13 - Tanner Cadieux VCU 4 1 4 - - - T13 - Will Hindemit North Alabama 5 1 5 - - - T13 - Will Preston Penn State 5 1 5 - - - T13 - AJ Wilhelm Xavier - - - - - T13 - Aidan Wilson Cincinnati - - - - - T13 - Arth Sinha Mississippi State - - - - - T13 - Christian Pardue Tennessee - - - - - T13 - Cole Stockard Kentucky - - - - - T13 - Colton Woosley Western Kentucky - - - - - T13 - Gavin Isbell Mississippi State - - - - - T13 - Harper Ackermann West Florida - - - - - T13 - Jack Morris North Alabama - - - - - T13 - Jackson Herrington Tennessee - - - - - T13 - Jacob Lang Kentucky - - - - - T13 - Jacob Settles Kentucky - - - - - T13 - Kaiden Drum Kennesaw State (IND) - - - - - T13 - Leo Wessel Cincinnati - - - - - T13 - Max Morgenstern VCU - - - - - T13 - Ryan Ford Cincinnati - - - - - T13 - Tim Peters Penn State - - - - - T13 - Tucker Jones Eastern Kentucky - - - - - T13 - Tyler Watts Tennessee - - - - - T13 - Yago Horno Mateo Mississippi State - - - - - T69 - Luke Coyle Kentucky (IND) 14 3 14 - - - T69 -",
           "fetchMode": "http-stroke",
           "division": "NCAA Division I"
         },
@@ -5295,7 +5357,7 @@
         }
       ],
       "error": null,
-      "scrapedAt": "2026-10-05T00:00:49.178Z",
+      "scrapedAt": "2026-10-05T14:05:04.703Z",
       "scheduleSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nUniversity of Memphis\nMen\nDivision:\nNCAA Division I\nConference:\nAmerican Athletic Conference\nHead Coach:\nBlake Smart\nRanking\nRoster\nSchedule\nSeason 2026/2027\nApr 12 - Apr 13, 2027\nMossy Oak Collegiate\nWest Point, Mississippi\nMossy Oak GC - West Point - Mississippi\nNCAA Division I\nMen\nMississippi State\nApr 5 - Apr 6, 2027\nMemphis Intercollegiate: Spirited by Old Dominick\nCordova, TN\nColonial CC - Cordova - TN\nNCAA Division I\nMen\nMemphis\nMar 15 - Mar 16, 2027\nThe Johnnie-O at Sea Island\nSt. Simons Island, Georgia\nSea Island Resort - St. Simons Island - Georgia\nNCAA Division I\nMen\nRutgers\nMar 7 - Mar 8, 2027\nColleton River Collegiate\nBluffton, SC\nColleton River Club - Bluffton - SC\nNCAA Division I\nMen\nMichigan State\nFeb 15 - Feb 16, 2027\nHal Williams Collegiate\nSemmes, AL\nMagnolia Grove - Semmes - AL\nNCAA Division I\nMen\nSouth Alabama\nFeb 1 - Feb 2, 2027\nN.I.T.\nTucson, Arizona\nOmni Tucson National Resort  - Tucson - AZ\nNCAA Division I\nMen\nArizona\nOct 31 - Nov 1, 2026\nSteelwood Collegiate\nLoxley, Alabama\nSteelwood GC - Loxley - Alabama\nNCAA Division I\nMen\nSouth Alabama\nOct 18 - Oct 19, 2026\nQuail Valley Collegiate Invitational\nVero Beach, FL\nQuail Valley Golf & River Club - Vero Beach - FL\nNCAA Division I\nMen\nUSF\nOct 5 - Oct 6, 2026\nCullan Brown Collegiate\nLexington, Kentucky\nLexington CC - Lexington - Kentucky\nScoreboardLive\nNCAA Division I\nMen\nKentucky\nSep 26 - Sep 28, 2026\n2026 Rhodes Fall Invitational\nRobinsonville, MS\nTunica National GCS - Robinsonville - MS\nScoreboardLive\nNCAA Division III\nMen\nRhodes\nSep 14 - Sep 15, 2026\nThe Bearcat Invitational\nCincinnati, OH\nColdstream Country Club\nScoreboardLive\nNCAA Division I\nMen\nCincinnati\nAug 31 - Sep 1, 2026\nVisit Knoxville Collegiate\nKnoxville, TN\nFox Den CC - Knoxville - TN\nScoreboardLive\nNCAA Division I\nMen\nTennessee\nLoad more\n\nIn Partnership With\n\nINFORMATION\nNational Collegiate Golf Ranking\nFrequently Asked Questions\nPrivacy Policy\nTerms of Service\nCOMPANY\nAbout us\nPress\nClippd.com\nCONTACT US\n\nClippd USA Ltd\n\nmail: support@clippd.io\n\nFOLLOW US\n "
     },
     "man": {
@@ -6072,7 +6134,7 @@
         }
       ],
       "error": null,
-      "scrapedAt": "2026-10-05T00:00:57.719Z",
+      "scrapedAt": "2026-10-05T14:05:12.279Z",
       "scheduleSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nManhattan University\nMen\nDivision:\nNCAA Division I\nConference:\nMetro Conference\nHead Coach:\nKeith Prokop\nRanking\nRoster\nSchedule\nSeason 2026/2027\nApr 17, 2027\nRoar-EE Invitational\nKingston, NY\nWiltwyck GC - Kingston - NY\nNCAA Division I\nMen\nColumbia\nApr 11 - Apr 12, 2027\nABARTA Coca-Cola Collegiate Invitational\nEaston, PA\nNorthampton CC - Easton - PA\nNCAA Division I\nMen\nLafayette College\nApr 5 - Apr 6, 2027\nJasper Spring Collegiate\nWayne, NJ\nNorth Jersey CC - Wayne - NJ\nNCAA Division I\nMen\nManhattan\nMar 29, 2027\nColumbia Spring Invitational\nSpringfield, PA\nRolling Green GC - Springfield - PA\nNCAA Division I\nMen\nColumbia\nFeb 8 - Feb 9, 2027\nBearkat Intercollegiate\nMontgomery, TX\nWalden On Lake Conroe - Montgomery - TX\nNCAA Division I\nMen\nSam Houston\nOct 26 - Oct 27, 2026\nWYKAGYL COLLEGIATE\nNew Rochelle, New York\nWykagyl CC - New Rochelle - New York\nNCAA Division I\nMen\nIona\nOct 19 - Oct 20, 2026\nBlue Hen Intercollegiate\nOxford, Pennsylvania\nWyncote GC - Oxford - Pennsylvania\nNCAA Division I\nMen\nDelaware\nOct 11 - Oct 13, 2026\nBucknell Invitational\nLewisburg, Pennsylvania\nBucknell GC - Lewisburg - Pennsylvania\nScoreboardLive\nNCAA Division I\nMen\nBucknell\nOct 3 - Oct 4, 2026\nColumbia Autumn Invitational\nLake Placid, NY\nLake Placid Club - Lake Placid - NY\nScoreboardLive\nNCAA Division I\nMen\nColumbia\nSep 19 - Sep 20, 2026\nRyan T Lee Memorial Collegiate\nSeekonk, MA\nLedgemont CC - Seekonk - MA\nNCAA Division I\nMen\nBrown\n\nIn Partnership With\n\nINFORMATION\nNational Collegiate Golf Ranking\nFrequently Asked Questions\nPrivacy Policy\nTerms of Service\nCOMPANY\nAbout us\nPress\nClippd.com\nCONTACT US\n\nClippd USA Ltd\n\nmail: support@clippd.io\n\nFOLLOW US\n "
     },
     "rochester": {
@@ -6539,6 +6601,20 @@
           "url": "https://scoreboard.clippd.com/tournaments/245197"
         },
         {
+          "name": "The Tartan Invitational",
+          "dates": "Oct 12 - Oct 13, 2026",
+          "city": "Ligonier, Pennsylvania",
+          "venue": "Laurel Valley GC - Ligonier - Pennsylvania",
+          "scoreboardLive": false,
+          "hasResults": false,
+          "isComplete": false,
+          "division": "NCAA Division III",
+          "start": "2026-10-12T00:00:00.000Z",
+          "end": "2026-10-13T00:00:00.000Z",
+          "tournamentId": "248469",
+          "url": "https://scoreboard.clippd.com/tournaments/248469"
+        },
+        {
           "name": "The Northeast Elite",
           "dates": "Sep 27 - Sep 28, 2026",
           "city": "Williamsport, Pennsylvania",
@@ -6582,7 +6658,7 @@
         }
       ],
       "error": null,
-      "scrapedAt": "2026-10-05T00:01:03.381Z",
+      "scrapedAt": "2026-10-05T14:05:17.044Z",
       "scheduleSnippet": "Home\nTournaments\nRankings\nTeams & Players\nNews\nLive Streams\nCoach Portal\n\nIn Partnership With\n\nUniversity of Rochester\nMen\nDivision:\nNCAA Division III\nConference:\nLiberty League\nRegion:\nRegion II - (M) DIII\nHead Coach:\nDan Wesley\nRanking\nRoster\nSchedule\nSeason 2026/2027\nApr 16 - Apr 17, 2027\nFred B Kravetz Invitational\nRochester, New York\nOak Hill CC - Rochester - New York\nNCAA Division III\nMen\nRochester\nMar 19 - Mar 21, 2027\nJekyll Island Collegiate Invitational MEN\nJekyll Island, GA\nJekyll Island GC - Jekyll Island - GA\nNCAA Division III\nMen\nOglethorpe\nSep 27 - Sep 28, 2026\nThe Northeast Elite\nWilliamsport, Pennsylvania\nWilliamsport CC - Williamsport - Pennsylvania\nScoreboardLive\nNCAA Division III\nMen\nPenn State Altoona\nSep 21 - Sep 22, 2026\nNCAA D3 Fall Preview at Kingsmill\nWilliamsburg, VA\nKingsmill Resort - Williamsburg - VA\nScoreboardLive\nNCAA Division III\nMen\nChristopher Newport\nSep 14 - Sep 15, 2026\nUAA Championship\nBatavia, Ohio\nElks Run GC - Batavia - Ohio\nScoreboardLive\nNCAA Division III\nMen\nNew York\n\nIn Partnership With\n\nINFORMATION\nNational Collegiate Golf Ranking\nFrequently Asked Questions\nPrivacy Policy\nTerms of Service\nCOMPANY\nAbout us\nPress\nClippd.com\nCONTACT US\n\nClippd USA Ltd\n\nmail: support@clippd.io\n\nFOLLOW US\n "
     }
   },
@@ -6590,7 +6666,7 @@
     "teamCount": 7,
     "successCount": 7,
     "tournamentPagesVisited": 23,
-    "tournamentsWithScores": 21,
+    "tournamentsWithScores": 22,
     "note": "v5.4: drop NAIA/NJCAA from NCAA schedules; visit boards 48h before tee; capture confirmed lineups before round 1."
   }
 }
