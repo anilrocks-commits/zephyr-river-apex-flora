@@ -8,6 +8,7 @@ export const TEAMS = [
   {
     id: "siu",
     name: "Southern Illinois",
+    div: "D1",
     clippdId: "4127",
     rosterUrl: "https://siusalukis.com/sports/mens-golf/roster",
     aliases: ["southern illinois", "siu", "southern illinois university", "southern illinois salukis"],
@@ -15,6 +16,7 @@ export const TEAMS = [
   {
     id: "ksu",
     name: "Kennesaw State",
+    div: "D1",
     clippdId: "4172",
     rosterUrl: "https://ksuowls.com/sports/mens-golf/roster",
     aliases: ["kennesaw state", "kennesaw state university", "ksu"],
@@ -22,6 +24,7 @@ export const TEAMS = [
   {
     id: "shu",
     name: "Seton Hall",
+    div: "D1",
     clippdId: "3163",
     rosterUrl: "https://shupirates.com/sports/mens-golf/roster",
     aliases: ["seton hall", "seton hall university"],
@@ -29,6 +32,7 @@ export const TEAMS = [
   {
     id: "ucsb",
     name: "UC Santa Barbara",
+    div: "D1",
     clippdId: "2520",
     rosterUrl: "https://ucsbgauchos.com/sports/mens-golf/roster",
     aliases: ["uc santa barbara", "ucsb", "california santa barbara", "santa barbara gauchos"],
@@ -36,6 +40,7 @@ export const TEAMS = [
   {
     id: "memphis",
     name: "Memphis",
+    div: "D1",
     clippdId: "3916",
     rosterUrl: "https://gotigersgo.com/sports/mgolf/roster",
     aliases: ["memphis", "university of memphis", "memphis tigers"],
@@ -43,12 +48,14 @@ export const TEAMS = [
   {
     id: "howard",
     name: "Howard",
+    div: "D1",
     rosterUrl: "https://hubison.com/sports/mgolf/roster",
     aliases: ["howard", "howard university", "howard bison"],
   },
   {
     id: "man",
     name: "Manhattan",
+    div: "D1",
     clippdId: "3652",
     rosterUrl: "https://gojaspers.com/sports/mens-golf/roster",
     aliases: ["manhattan", "manhattan university", "manhattan college", "manhattan jaspers"],
@@ -56,18 +63,21 @@ export const TEAMS = [
   {
     id: "fdu",
     name: "Fairleigh Dickinson",
+    div: "D1",
     rosterUrl: "https://fduknights.com/sports/mens-golf/roster",
     aliases: ["fairleigh dickinson", "fdu", "fairleigh dickinson university"],
   },
   {
     id: "umhb",
     name: "UMHB",
+    div: "D3",
     rosterUrl: "https://cruathletics.com/sports/mens-golf/roster",
     aliases: ["umhb", "mary hardin baylor", "university of mary hardin baylor", "mary hardin-baylor"],
   },
   {
     id: "rochester",
     name: "University of Rochester",
+    div: "D3",
     clippdId: "2457",
     rosterUrl: "https://uofrathletics.com/sports/mens-golf/roster",
     aliases: ["university of rochester", "rochester", "rochester yellowjackets"],
@@ -75,6 +85,7 @@ export const TEAMS = [
   {
     id: "cmu",
     name: "Carnegie Mellon",
+    div: "D3",
     rosterUrl: "https://athletics.cmu.edu/sports/mgolf/roster",
     aliases: ["carnegie mellon", "carnegie mellon university", "cmu"],
   },

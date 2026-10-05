@@ -1,5 +1,6 @@
 import type { Division, Player, Program, RecruitCommit, Year } from "@/data/types";
 import type { LiveTeam, LiveTournament } from "@/lib/live";
+import { eventMatchesProgramDivision, normalizeEventDivision } from "@/lib/division";
 
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36";
@@ -202,6 +203,7 @@ interface ClippdApiEvent {
   state?: string;
   hasResults?: boolean;
   isComplete?: boolean;
+  division?: string;
 }
 
 async function fetchScheduleApi(clippdId: string): Promise<LiveTournament[]> {
@@ -226,6 +228,7 @@ async function fetchScheduleApi(clippdId: string): Promise<LiveTournament[]> {
       url: id ? `https://scoreboard.clippd.com/tournaments/${id}` : null,
       status: t.isComplete ? "complete" : t.hasResults ? "live" : "upcoming",
       scoreboardLive: Boolean(t.hasResults && !t.isComplete),
+      division: normalizeEventDivision(t.division) || t.division || null,
       players: [],
     };
   });
@@ -455,7 +458,7 @@ export async function importCollegeFromClippd(
   const rosterUrl = `${teamUrl}/roster`;
   const scheduleUrl = `${teamUrl}/schedule`;
 
-  const [teamPage, rosterPage, schedule] = await Promise.all([
+  const [teamPage, rosterPage, rawSchedule] = await Promise.all([
     httpGet(teamUrl),
     httpGet(rosterUrl),
     fetchScheduleApi(clippdId),
@@ -470,8 +473,17 @@ export async function importCollegeFromClippd(
   const players = parseRoster(htmlToLines(rosterPage.text), id);
   const seniors = players.filter((p) => p.year === "Sr" || p.year === "5th" || p.year === "Gr").length;
 
+  const schedule = rawSchedule.filter((e) =>
+    eventMatchesProgramDivision(meta.div, e.division, e.name),
+  );
+  const now = Date.now();
   const toVisit = schedule
-    .filter((e) => e.tournamentId && (e.status === "complete" || e.status === "live" || e.scoreboardLive))
+    .filter((e) => {
+      if (!e.tournamentId) return false;
+      if (e.status === "complete" || e.status === "live" || e.scoreboardLive) return true;
+      const start = e.dates ? Date.parse(e.dates) : NaN;
+      return Number.isFinite(start) && start - now <= 48 * 3600_000;
+    })
     .slice(0, 4);
   const boards = await Promise.all(toVisit.map((e) => scrapeTournament(String(e.tournamentId), name)));
   const tournaments = schedule.map((ev) => {

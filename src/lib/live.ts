@@ -7,6 +7,12 @@ import type {
   Tournament,
 } from "@/data/types";
 import rawLive from "../../public/data/live-results.json";
+import {
+  divisionFromSnippet,
+  eventMatchesProgramDivision,
+  isDivisionLine,
+  normalizeEventDivision,
+} from "@/lib/division";
 
 export interface LivePlayerScore {
   name: string;
@@ -34,6 +40,9 @@ export interface LiveTournament {
   rawSnippet?: string | null;
   scoreboardLive?: boolean;
   city?: string | null;
+  division?: string | null;
+  hasResults?: boolean;
+  isComplete?: boolean;
 }
 
 export interface LiveTeam {
@@ -76,7 +85,7 @@ const DATE_LINE =
   /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})(?:\s*[-–]\s*(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+)?(\d{1,2}))?,\s*(\d{4})$/i;
 
 const SKIP_LINE =
-  /^(NCAA|NAIA|Men|Women|Division|Conference|Head Coach|Ranking|Roster|Schedule|Season|Home|Tournaments|News|Live Streams|Coach Portal|In Partnership|INFORMATION|National|Load more|ScoreboardLive)$/i;
+  /^(Men|Women|Division|Conference|Head Coach|Ranking|Roster|Schedule|Season|Home|Tournaments|News|Live Streams|Coach Portal|In Partnership|INFORMATION|National|Load more|ScoreboardLive)$/i;
 
 const NOISE_WORDS = new Set([
   "the",
@@ -157,12 +166,32 @@ export function eventStatusFromDates(
   dates: string,
   hasScores: boolean,
   today = new Date(),
+  opts?: { scoreboardLive?: boolean; hasLineup?: boolean },
 ): EventStatus {
   const range = parseEventRange(dates);
   if (!range) return hasScores ? "complete" : "upcoming";
-  const day = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  if (day < range.start) return "upcoming";
-  if (day > range.end) return hasScores ? "complete" : "historical";
+  // College golf dates are US calendar days. Compare in Eastern so an
+  // Australia-evening scrape does not treat an Oct 5 Kentucky tee time as "tomorrow".
+  const ymd = (d: Date) =>
+    d.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const cal = (d: Date) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const todayY = ymd(today);
+  const startY = cal(range.start);
+  const endY = cal(range.end);
+  if (todayY < startY) {
+    if (opts?.scoreboardLive || opts?.hasLineup) {
+      const startUtc = Date.UTC(
+        range.start.getFullYear(),
+        range.start.getMonth(),
+        range.start.getDate(),
+      );
+      if (startUtc - today.getTime() <= 48 * 3600_000) return "live";
+    }
+    return "upcoming";
+  }
+  if (todayY > endY) return hasScores ? "complete" : "historical";
   return "live";
 }
 
@@ -248,12 +277,15 @@ export function parseScheduleSnippet(snippet: string | null | undefined): LiveTo
     const name = lines[i + 1] ?? null;
     const extras: string[] = [];
     let scoreboardLive = false;
+    let division: string | null = null;
     let j = i + 2;
     while (j < lines.length && !DATE_LINE.test(lines[j])) {
       const t = lines[j];
       if (t.toLowerCase() === "scoreboardlive") scoreboardLive = true;
-      else if (SKIP_LINE.test(t) || /\((Men|Women)\)$/i.test(t)) {
-        /* nav / division chrome */
+      else if (isDivisionLine(t) || /^NCAA Division/i.test(t)) {
+        division = normalizeEventDivision(t) || t;
+      } else if (SKIP_LINE.test(t) || /\((Men|Women)\)$/i.test(t)) {
+        /* nav / gender chrome */
       } else extras.push(t);
       j += 1;
     }
@@ -263,6 +295,7 @@ export function parseScheduleSnippet(snippet: string | null | undefined): LiveTo
       city: extras[0] ?? null,
       venue: extras[1] ?? extras[0] ?? null,
       scoreboardLive,
+      division,
       players: [],
       teamRounds: [],
     });
@@ -476,6 +509,7 @@ function overlayPage(schedule: LiveTournament, page?: LiveTournament | null): Li
     venue: page.venue || meta.venue || schedule.venue,
     city: schedule.city,
     scoreboardLive: schedule.scoreboardLive || page.scoreboardLive,
+    division: page.division || schedule.division,
     players,
     teamRounds: page.teamRounds?.length ? page.teamRounds : schedule.teamRounds,
     url: page.url || schedule.url,
@@ -499,7 +533,9 @@ function liveEventToTournament(
   const scores = liveScoresToRows(program, live, 72);
   const dates = live.dates || "TBA";
   const teamRounds = applyCanceledRounds(live.teamRounds ?? [], flags);
-  const hasScores = scores.some((s) => s.rounds.some((r) => r != null)) || live.teamTotal != null;
+  const hasPosted =
+    scores.some((s) => s.rounds.some((r) => r != null)) || live.teamTotal != null;
+  const hasLineup = scores.length > 0;
   const id = live.tournamentId
     ? `${program.id}-clippd-${live.tournamentId}`
     : `${program.id}-${slug(live.name || dates)}`;
@@ -514,16 +550,21 @@ function liveEventToTournament(
     par: 72,
     fieldTeams: live.teamStandings?.length || null,
     fieldPlayers: null,
-    status: eventStatusFromDates(dates, hasScores),
+    status: eventStatusFromDates(dates, hasPosted, new Date(), {
+      scoreboardLive: live.scoreboardLive,
+      hasLineup,
+    }),
     teamPlace: live.teamPlace != null ? String(live.teamPlace) : null,
     teamRounds,
     teamTotal: playedTotal(teamRounds, live.teamTotal ?? null),
     teamToPar: parseToPar(live.teamToPar),
     scores,
     source: "clippd",
-    sourceLabel: hasScores
+    sourceLabel: hasPosted
       ? `Clippd scoreboard · ${formatScraped(scrapedAt)}`
-      : "Clippd schedule",
+      : hasLineup
+        ? `Clippd lineup · ${formatScraped(scrapedAt)}`
+        : "Clippd schedule",
     sourceUrl: live.url || program.clippdSchedule,
     clippdUrl: live.url || program.clippdSchedule,
     clippdTournamentId: live.tournamentId ?? undefined,
@@ -554,9 +595,10 @@ function mergeOne(
   const base = curated as Tournament;
   const flags = canceledRoundFlags(liveEvent);
   const liveRows = liveScoresToRows(program, liveEvent, base.par);
-  const liveHasScores =
+  const liveHasPosted =
     liveRows.some((s) => s.rounds.some((r) => r != null)) || liveEvent.teamTotal != null;
-  const scores = liveHasScores ? liveRows : base.scores;
+  const liveHasLineup = liveRows.length > 0;
+  const scores = liveHasPosted || liveHasLineup ? liveRows : base.scores;
   const dates = liveEvent.dates || base.dates;
   const teamRounds = applyCanceledRounds(
     liveEvent.teamRounds?.length ? liveEvent.teamRounds : base.teamRounds,
@@ -577,7 +619,10 @@ function mergeOne(
     name: base.name,
     dates,
     venue: base.venue || formatVenue(liveEvent),
-    status: eventStatusFromDates(dates, hasScores),
+    status: eventStatusFromDates(dates, hasScores, new Date(), {
+      scoreboardLive: liveEvent.scoreboardLive,
+      hasLineup: scores.length > 0,
+    }),
     teamPlace:
       liveEvent.teamPlace != null ? String(liveEvent.teamPlace) : base.teamPlace,
     teamRounds,
@@ -585,11 +630,13 @@ function mergeOne(
     teamToPar: parseToPar(liveEvent.teamToPar) ?? base.teamToPar,
     fieldTeams: liveEvent.teamStandings?.length || base.fieldTeams,
     scores,
-    source: liveHasScores ? "clippd" : base.source,
-    sourceLabel: liveHasScores
+    source: liveHasPosted ? "clippd" : liveHasLineup ? "clippd" : base.source,
+    sourceLabel: liveHasPosted
       ? `Clippd scoreboard · ${formatScraped(scrapedAt)}`
-      : base.sourceLabel,
-    sourceUrl: liveHasScores ? liveEvent.url || base.sourceUrl : base.sourceUrl,
+      : liveHasLineup
+        ? `Clippd lineup · ${formatScraped(scrapedAt)}`
+        : base.sourceLabel,
+    sourceUrl: liveHasPosted || liveHasLineup ? liveEvent.url || base.sourceUrl : base.sourceUrl,
     clippdUrl: liveEvent.url || base.clippdUrl || program.clippdSchedule,
     clippdTournamentId: liveEvent.tournamentId ?? base.clippdTournamentId,
     canceledRounds: flags.some(Boolean) ? flags : base.canceledRounds,
@@ -623,7 +670,10 @@ export function formatScraped(iso: string | null | undefined): string {
   return `${days}d ago`;
 }
 
-export function liveEventsForTeam(team: LiveTeam | undefined): LiveTournament[] {
+export function liveEventsForTeam(
+  team: LiveTeam | undefined,
+  programDiv?: string | null,
+): LiveTournament[] {
   if (!team) return [];
   const scheduled =
     team.schedule && team.schedule.length
@@ -667,7 +717,15 @@ export function liveEventsForTeam(team: LiveTeam | undefined): LiveTournament[] 
     if (isGarbageLive(page) && !(page.players?.length) && page.teamTotal == null) continue;
     merged.push(page);
   }
-  return merged.filter((e): e is LiveTournament => e != null);
+  return merged.filter((e): e is LiveTournament => {
+    if (e == null) return false;
+    const division =
+      e.division ||
+      divisionFromSnippet(team.scheduleSnippet, e.name) ||
+      null;
+    if (division && !e.division) e.division = division;
+    return eventMatchesProgramDivision(programDiv, division, e.name);
+  });
 }
 
 function sortEvents(events: Tournament[]): Tournament[] {
@@ -691,7 +749,7 @@ export function withLiveResults(
 ): Program {
   const team = live?.teams?.[program.id];
   const scrapedAt = team?.scrapedAt || live?.scrapedAt || "";
-  const liveEvents = liveEventsForTeam(team);
+  const liveEvents = liveEventsForTeam(team, program.div);
   const usedLive = new Set<LiveTournament>();
   const usedCurated = new Set<string>();
   const merged: Tournament[] = [];

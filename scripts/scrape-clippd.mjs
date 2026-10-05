@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Clippd college golf scraper (v5.3)
+ * Clippd college golf scraper (v5.4)
  * --------------------------------
- * HTTP + Chrome UA stroke boards. Only visits live/past events.
+ * HTTP + Chrome UA stroke boards. Visit live/past events AND boards
+ * whose tee time is within 48h so confirmed lineups land before round 1.
  */
 
 import { chromium } from "playwright";
@@ -30,7 +31,8 @@ const MONTHS = {
 const DATE_LINE =
   /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})(?:\s*[-–]\s*(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+)?(\d{1,2}))?,\s*(\d{4})$/i;
 const SKIP_LINE =
-  /^(NCAA|NAIA|Men|Women|Division|Conference|Head Coach|Ranking|Roster|Schedule|Season|Home|Tournaments|News|Live Streams|Coach Portal|In Partnership|INFORMATION|National|Load more|ScoreboardLive)$/i;
+  /^(Men|Women|Division|Conference|Head Coach|Ranking|Roster|Schedule|Season|Home|Tournaments|News|Live Streams|Coach Portal|In Partnership|INFORMATION|National|Load more|ScoreboardLive)$/i;
+const DIV_LINE = /^(NAIA|NJCAA|NCAA(?:\s+Division)?\s*(I{1,3}|1|2|3))$/i;
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -80,6 +82,43 @@ function stripHoleNoise(flat) {
     .replace(/\b(?:OUT|IN|RD)\b/g, " ");
 }
 
+function normalizeEventDivision(raw) {
+  if (!raw) return null;
+  const s = String(raw).replace(/\s+/g, " ").trim();
+  if (/\bNAIA\b/i.test(s)) return "NAIA";
+  if (/\bNJCAA\b/i.test(s)) return "NJCAA";
+  if (/division\s*(III|3)\b/i.test(s)) return "NCAA Division III";
+  if (/division\s*(II|2)\b/i.test(s) && !/III/i.test(s)) return "NCAA Division II";
+  if (/division\s*(I|1)\b/i.test(s)) return "NCAA Division I";
+  return null;
+}
+
+function eventMatchesTeamDiv(teamDiv, eventDivision, eventName) {
+  const eventDiv =
+    normalizeEventDivision(eventDivision) || normalizeEventDivision(eventName) || null;
+  if (!eventDiv) return true;
+  const team = String(teamDiv || "D1").toUpperCase();
+  if (eventDiv === "NAIA" || eventDiv === "NJCAA") return team === "NAIA" || team === "NJCAA";
+  if (eventDiv === "NCAA Division III") return team === "D3";
+  if (eventDiv === "NCAA Division II") return team === "D2";
+  if (eventDiv === "NCAA Division I") return team === "D1";
+  return true;
+}
+
+function formatIsoRange(start, end) {
+  if (!start) return null;
+  const s = new Date(`${start}T12:00:00Z`);
+  const e = new Date(`${end || start}T12:00:00Z`);
+  const a = s.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  const b = e.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  return start === end || !end ? b : `${a} - ${b}`;
+}
+
 function parseRange(dates) {
   if (!dates) return null;
   const m = String(dates).trim().match(DATE_LINE);
@@ -107,11 +146,14 @@ function parseScheduleSnippet(snippet) {
     const name = lines[i + 1] || null;
     const extras = [];
     let scoreboardLive = false;
+    let division = null;
     let j = i + 2;
     while (j < lines.length && !DATE_LINE.test(lines[j])) {
       const t = lines[j];
       if (t.toLowerCase() === "scoreboardlive") scoreboardLive = true;
-      else if (SKIP_LINE.test(t) || /\((Men|Women)\)$/i.test(t)) {
+      else if (DIV_LINE.test(t) || /^NCAA Division/i.test(t)) {
+        division = normalizeEventDivision(t) || t;
+      } else if (SKIP_LINE.test(t) || /\((Men|Women)\)$/i.test(t)) {
       } else extras.push(t);
       j += 1;
     }
@@ -122,6 +164,7 @@ function parseScheduleSnippet(snippet) {
       city: extras[0] || null,
       venue: extras[1] || extras[0] || null,
       scoreboardLive,
+      division,
       start: range?.start?.toISOString() || null,
       end: range?.end?.toISOString() || null,
       tournamentId: null,
@@ -182,28 +225,29 @@ function attachIds(schedule, links) {
   return schedule;
 }
 
-function pickToVisit(schedule, links) {
-  // Only visit boards that can already have scores: live, ScoreboardLive, or
-  // finished within the lookback window. Never hit pure-future events.
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const windowStart = new Date(today);
-  windowStart.setDate(windowStart.getDate() - 45);
+function pickToVisit(schedule) {
+  // Visit boards that can have a lineup or scores: in-progress, ScoreboardLive,
+  // starting within 48h (US tee sheets post the day before), or finished in
+  // the lookback window. Timezone-agnostic so an Australia-evening scrape
+  // still picks up an Oct 5 Kentucky round.
+  const now = Date.now();
+  const lookahead = 48 * 3600 * 1000;
+  const lookback = 45 * 24 * 3600 * 1000;
 
   const withIds = schedule.filter((s) => s.tournamentId);
 
   const scored = withIds
     .map((s) => {
       const range = parseRange(s.dates);
-      const start = range?.start;
-      const end = range?.end || start;
-      if (!start || !end) {
-        return s.scoreboardLive ? { ...s, priority: 1 } : null;
+      const start = range?.start?.getTime() ?? (s.start ? Date.parse(s.start) : NaN);
+      const end = range?.end?.getTime() ?? (s.end ? Date.parse(s.end) : start);
+      if (!Number.isFinite(start) || !Number.isFinite(end)) {
+        return s.scoreboardLive || s.hasResults ? { ...s, priority: 1 } : null;
       }
-      const happening = start <= today && today <= end;
-      const past = end < today && end >= windowStart;
+      const happening = start - lookahead <= now && now <= end + 18 * 3600 * 1000;
+      const past = end < now && now - end <= lookback;
       if (happening) return { ...s, priority: 0 };
-      if (s.scoreboardLive && start <= today) return { ...s, priority: 1 };
+      if (s.scoreboardLive || s.hasResults) return { ...s, priority: 1 };
       if (past) return { ...s, priority: 2 };
       return null;
     })
@@ -513,23 +557,25 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
               ? fmt(data.startDate)
               : `${fmt(data.startDate)} - ${fmt(data.endDate)}`);
         }
-        if (data.isComplete && (result.players.length || result.teamTotal != null)) {
+        if (data.isComplete && (result.players.some((p) => (p.rounds || []).some((r) => r != null)) || result.teamTotal != null)) {
           result.status = "complete";
-        } else if (data.hasResults && !data.isComplete) {
+        } else if (result.players.length || data.hasResults) {
           result.status = "live";
         }
+        if (data.division) result.division = normalizeEventDivision(data.division) || data.division;
       }
     } catch {
       /* optional */
     }
 
-    const hasScores =
-      result.players.length > 0 ||
+    const hasPosted =
+      (result.players || []).some((p) => (p.rounds || []).some((r) => r != null)) ||
       result.teamPlace ||
-      result.teamTotal != null ||
-      result.teamStandings.length > 0;
+      result.teamTotal != null;
+    const hasLineup = (result.players || []).length > 0;
     if (!result.status) {
-      if (hasScores) result.status = "complete";
+      if (hasPosted) result.status = "complete";
+      else if (hasLineup) result.status = "live";
       else if (/no players to show yet/i.test(result.rawSnippet || ""))
         result.status = "upcoming";
       else result.status = "unknown";
@@ -539,6 +585,48 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
   }
 
   return result;
+}
+
+async function scrapeScheduleApi(team) {
+  const url = `https://scoreboard.clippd.com/api/tournaments?schoolId=${team.clippdId}&season=2027&limit=50`;
+  const res = await httpGet(url);
+  if (!res.ok) return { ok: false, scheduleUrl: url, error: `API ${res.status}` };
+  let data;
+  try {
+    data = JSON.parse(res.text);
+  } catch {
+    return { ok: false, scheduleUrl: url, error: "API JSON parse" };
+  }
+  const schedule = [];
+  for (const t of data.results || []) {
+    const division = normalizeEventDivision(t.division) || t.division || null;
+    if (!eventMatchesTeamDiv(team.div, division, t.tournamentName)) continue;
+    const id = t.tournamentId != null ? String(t.tournamentId) : null;
+    const dates = formatIsoRange(t.startDate, t.endDate);
+    schedule.push({
+      name: t.tournamentName || null,
+      dates,
+      city: [t.city, t.state].filter(Boolean).join(", ") || null,
+      venue: t.venue || null,
+      scoreboardLive: Boolean(t.hasResults && !t.isComplete),
+      hasResults: Boolean(t.hasResults),
+      isComplete: Boolean(t.isComplete),
+      division,
+      start: t.startDate ? `${t.startDate}T00:00:00.000Z` : null,
+      end: t.endDate ? `${t.endDate}T00:00:00.000Z` : null,
+      tournamentId: id,
+      url: id ? `https://scoreboard.clippd.com/tournaments/${id}` : null,
+    });
+  }
+  return {
+    ok: schedule.length > 0,
+    scheduleUrl: `https://scoreboard.clippd.com/teams/${team.clippdId}/schedule`,
+    schedule,
+    links: schedule
+      .filter((s) => s.tournamentId)
+      .map((s) => ({ tournamentId: s.tournamentId, name: s.name, href: s.url })),
+    scheduleSnippet: null,
+  };
 }
 
 async function scrapeScheduleHttp(team) {
@@ -653,7 +741,13 @@ async function scrapeTeam(page, team) {
   };
 
   try {
-    let sched = await scrapeScheduleHttp(team);
+    let sched = await scrapeScheduleApi(team);
+    if (!sched.ok || (sched.schedule?.length || 0) < 2) {
+      const httpSched = await scrapeScheduleHttp(team);
+      if (httpSched.ok && (httpSched.schedule?.length || 0) > (sched.schedule?.length || 0)) {
+        sched = httpSched;
+      }
+    }
     if ((!sched.ok || (sched.schedule?.length || 0) < 2) && page) {
       console.log("  schedule HTTP thin — trying Playwright");
       sched = await scrapeSchedulePlaywright(page, team);
@@ -663,7 +757,9 @@ async function scrapeTeam(page, team) {
       return result;
     }
 
-    result.schedule = sched.schedule || [];
+    result.schedule = (sched.schedule || []).filter((e) =>
+      eventMatchesTeamDiv(team.div, e.division, e.name),
+    );
     result.scheduleSnippet = sched.scheduleSnippet || null;
     result.scheduleUrl = sched.scheduleUrl;
 
@@ -674,7 +770,7 @@ async function scrapeTeam(page, team) {
       return true;
     });
 
-    const toVisit = pickToVisit(result.schedule, links);
+    const toVisit = pickToVisit(result.schedule);
     console.log(
       `  schedule=${result.schedule.length} links=${links.length} visiting=${toVisit.length}`,
     );
@@ -685,6 +781,7 @@ async function scrapeTeam(page, team) {
       if (!detail.name && t.name) detail.name = t.name;
       if (!detail.dates && t.dates) detail.dates = t.dates;
       if (!detail.venue && t.venue) detail.venue = t.venue;
+      if (!detail.division && t.division) detail.division = t.division;
       result.tournaments.push(detail);
       const scored =
         detail.teamPlace ||
@@ -704,7 +801,7 @@ async function scrapeTeam(page, team) {
 }
 
 async function main() {
-  console.log("Clippd scraper v5.3 starting…");
+  console.log("Clippd scraper v5.4 starting…");
   console.log(
     `  mode=http-stroke  headful=${HEADFUL} recent=${RECENT_ONLY} teams=${TEAMS.length}`,
   );
@@ -759,14 +856,14 @@ async function main() {
   const payload = {
     scrapedAt: new Date().toISOString(),
     source: "clippd",
-    version: "5.3",
+    version: "5.4",
     teams,
     meta: {
       teamCount: TEAMS.length,
       successCount: Object.values(teams).filter((t) => !t.error).length,
       tournamentPagesVisited: allTournaments.length,
       tournamentsWithScores: withScores.length,
-      note: "v5.3: skip future boards; max 3 rounds; clean RSC venue noise. Scores never invented.",
+      note: "v5.4: drop NAIA/NJCAA from NCAA schedules; visit boards 48h before tee; capture confirmed lineups before round 1.",
     },
   };
 

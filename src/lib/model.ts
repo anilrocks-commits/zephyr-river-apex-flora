@@ -296,12 +296,19 @@ export interface PredictedSquad {
   note: string;
 }
 
-export function predictNextSquad(program: Program, teamSize = 5): PredictedSquad | null {
+export function predictNextSquad(
+  program: Program,
+  teamSize = 5,
+  excludeEventId?: string,
+): PredictedSquad | null {
   if (program.rosterUnknown || program.players.length === 0) return null;
 
-  const lineupEvents = eventsWithLineup(program).filter(
-    (e) => e.status === "complete" || e.status === "live" || e.status === "historical",
-  );
+  const lineupEvents = eventsWithLineup(program).filter((e) => {
+    if (excludeEventId && e.id === excludeEventId) return false;
+    const posted = e.scores.some((s) => s.rounds.some((r) => r != null));
+    if (e.status === "live" && !posted) return false;
+    return e.status === "complete" || e.status === "live" || e.status === "historical";
+  });
   const ordered = [...lineupEvents].sort(
     (a, b) => eventStartMs(a.dates) - eventStartMs(b.dates),
   );
@@ -429,6 +436,68 @@ export function predictNextSquad(program: Program, teamSize = 5): PredictedSquad
       : `Based on the only posted lineup so far. Confidence rises after a second event.`;
 
   return { team, individuals, eventsUsed, confidence, note };
+}
+
+export interface LineupComparison {
+  matchCount: number;
+  teamSize: number;
+  surprises: { playerId: string; name: string }[];
+  omitted: { playerId: string; name: string }[];
+  individuals: { playerId: string; name: string }[];
+  headline: string;
+  body: string;
+  tone: "up" | "watch" | "info";
+}
+
+export function compareLineupToPrediction(
+  event: Tournament,
+  predicted: PredictedSquad,
+): LineupComparison | null {
+  const confirmedTeam = event.scores.filter((s) => s.role === "team");
+  if (!confirmedTeam.length) return null;
+  const predIds = new Set(predicted.team.map((p) => p.playerId));
+  const confIds = new Set(confirmedTeam.map((s) => s.playerId));
+  const nameOf = (id: string, fallback?: string) =>
+    predicted.team.find((p) => p.playerId === id)?.name ||
+    predicted.individuals.find((p) => p.playerId === id)?.name ||
+    event.scores.find((s) => s.playerId === id)?.playerName ||
+    fallback ||
+    id;
+  const surprises = confirmedTeam
+    .filter((s) => !predIds.has(s.playerId))
+    .map((s) => ({ playerId: s.playerId, name: nameOf(s.playerId, s.playerName) }));
+  const omitted = predicted.team
+    .filter((p) => !confIds.has(p.playerId))
+    .map((p) => ({ playerId: p.playerId, name: p.name }));
+  const individuals = event.scores
+    .filter((s) => s.role === "ind")
+    .map((s) => ({ playerId: s.playerId, name: nameOf(s.playerId, s.playerName) }));
+  const matchCount = confirmedTeam.filter((s) => predIds.has(s.playerId)).length;
+  const teamSize = Math.max(confirmedTeam.length, predicted.team.length);
+  let headline: string;
+  let body: string;
+  let tone: LineupComparison["tone"] = "info";
+  if (!surprises.length && !omitted.length) {
+    headline = "Lineup matches the projection";
+    body = `Coach named the same five the model had from the last ${predicted.eventsUsed} event${predicted.eventsUsed === 1 ? "" : "s"}.`;
+    tone = "up";
+  } else if (surprises.length && omitted.length) {
+    headline = "Projection vs confirmed: coach made a change";
+    body = `${surprises.map((s) => s.name).join(", ")} in the five; ${omitted.map((s) => s.name).join(", ")} projected but not named.`;
+    tone = "watch";
+  } else if (surprises.length) {
+    headline = "Surprise team start";
+    body = `${surprises.map((s) => s.name).join(", ")} not in the projected five.`;
+    tone = "watch";
+  } else {
+    headline = "Projected starter omitted";
+    body = `${omitted.map((s) => s.name).join(", ")} was projected in the five and is not on the confirmed card.`;
+    tone = "watch";
+  }
+  if (individuals.length) {
+    body += ` IND: ${individuals.map((s) => s.name).join(", ")}.`;
+  }
+  return { matchCount, teamSize, surprises, omitted, individuals, headline, body, tone };
 }
 
 const MONTH_IDX: Record<string, number> = {

@@ -4,7 +4,7 @@ import type { Program, Tournament } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 import { RoundCell, ToPar } from "@/components/team/ScoreCells";
 import { formatPlace } from "@/lib/format";
-import { predictNextSquad, nextUpcomingEvent } from "@/lib/model";
+import { predictNextSquad, nextUpcomingEvent, compareLineupToPrediction } from "@/lib/model";
 import { cn } from "@/lib/utils";
 
 const statusVariant: Record<string, "live" | "accent" | "default" | "warn"> = {
@@ -45,10 +45,15 @@ export function TournamentCard({
   const roundCount = Math.max(lastPlayed, lastCanceled, 0) + 1;
   const roundLabels = Array.from({ length: roundCount }, (_, i) => `R${i + 1}`);
 
-  // Predicted squad only on the next upcoming event (and only when we have lineup history)
   const nextUp = nextUpcomingEvent(program);
   const isNextUpcoming = event.status === "upcoming" && nextUp?.id === event.id;
-  const predicted = isNextUpcoming ? predictNextSquad(program) : null;
+  const predicted = predictNextSquad(program, 5, event.id);
+  const showPredicted =
+    Boolean(predicted) && !hasScores && (isNextUpcoming || event.status === "live");
+  const comparison =
+    hasScores && predicted && (event.status === "live" || isNextUpcoming)
+      ? compareLineupToPrediction(event, predicted)
+      : null;
 
   return (
     <article className="overflow-hidden rounded-xl bg-surface shadow-[var(--shadow-border)]">
@@ -99,6 +104,8 @@ export function TournamentCard({
             </p>
           ) : null}
 
+          {comparison ? <LineupCompareBlock comparison={comparison} /> : null}
+
           {hasScores ? (
             <div className="-mx-4 mt-4 overflow-x-auto sm:mx-0">
               <table className="w-full min-w-[36rem] border-collapse text-sm">
@@ -148,7 +155,7 @@ export function TournamentCard({
                 </tbody>
               </table>
             </div>
-          ) : predicted ? (
+          ) : showPredicted && predicted ? (
             <PredictedSquadBlock predicted={predicted} />
           ) : (
             <p className="mt-4 rounded-lg bg-surface-2 px-3 py-3 text-sm text-muted">
@@ -160,8 +167,8 @@ export function TournamentCard({
 
           {!hasPostedRounds && hasScores ? (
             <p className="mt-3 text-xs text-subtle">
-              Lineup is confirmed. Round scores will fill in from Clippd / the official recap — struck
-              scores, when present, are the 5-count-4 drop.
+              Confirmed lineup from Clippd — rounds have not posted yet. Projection above is the
+              model; the table is who the coach actually named.
             </p>
           ) : null}
 
@@ -257,6 +264,29 @@ function RoleChip({ role }: { role: string }) {
   if (role === "team") return <Badge variant="accent">Team</Badge>;
   if (role === "ind") return <Badge variant="warn">IND</Badge>;
   return <Badge>DNP</Badge>;
+}
+
+function LineupCompareBlock({
+  comparison,
+}: {
+  comparison: NonNullable<ReturnType<typeof compareLineupToPrediction>>;
+}) {
+  const tone =
+    comparison.tone === "up" ? "accent" : comparison.tone === "watch" ? "warn" : "default";
+  return (
+    <div className="mt-3 rounded-lg border border-border bg-surface-2/60 px-3 py-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] uppercase tracking-[0.14em] text-subtle">
+          Projection vs confirmed
+        </span>
+        <Badge variant={tone}>
+          {comparison.matchCount}/{comparison.teamSize} match
+        </Badge>
+      </div>
+      <p className="mt-1.5 text-sm font-medium text-fg">{comparison.headline}</p>
+      <p className="mt-0.5 text-xs leading-relaxed text-muted">{comparison.body}</p>
+    </div>
+  );
 }
 
 function PredictedSquadBlock({
