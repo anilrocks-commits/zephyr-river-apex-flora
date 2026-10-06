@@ -1,7 +1,11 @@
 export function formatToPar(n: number | null | undefined): string {
-  if (n === null || n === undefined) return "—";
-  if (n === 0) return "E";
-  return n > 0 ? `+${n}` : `${n}`;
+  if (n === null || n === undefined || Number.isNaN(n)) return "—";
+  const rounded = Math.round(n * 100) / 100;
+  if (Object.is(rounded, -0) || rounded === 0) return "E";
+  const body = Number.isInteger(rounded)
+    ? String(Math.abs(rounded))
+    : Math.abs(rounded).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+  return rounded > 0 ? `+${body}` : `-${body}`;
 }
 
 export function formatRound(n: number | null | undefined): string {

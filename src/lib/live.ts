@@ -13,6 +13,7 @@ import {
   isDivisionLine,
   normalizeEventDivision,
 } from "@/lib/division";
+import { parseCoursePar } from "@/lib/clippd-text";
 
 export interface LivePlayerScore {
   name: string;
@@ -43,6 +44,7 @@ export interface LiveTournament {
   division?: string | null;
   hasResults?: boolean;
   isComplete?: boolean;
+  par?: number | null;
 }
 
 export interface LiveTeam {
@@ -410,6 +412,14 @@ function salvageTeamFromSnippet(
   };
 }
 
+function resolvePar(live: LiveTournament, fallback?: number | null): number {
+  if (live.par && live.par >= 67 && live.par <= 75) return live.par;
+  const fromSnippet = parseCoursePar(live.rawSnippet);
+  if (fromSnippet) return fromSnippet;
+  if (fallback && fallback >= 67 && fallback <= 75) return fallback;
+  return 72;
+}
+
 function liveScoresToRows(program: Program, live: LiveTournament, par?: number): PlayerRound[] {
   const flags = canceledRoundFlags(live);
   const players = live.players ?? [];
@@ -510,6 +520,7 @@ function overlayPage(schedule: LiveTournament, page?: LiveTournament | null): Li
     city: schedule.city,
     scoreboardLive: schedule.scoreboardLive || page.scoreboardLive,
     division: page.division || schedule.division,
+    par: page.par || schedule.par,
     players,
     teamRounds: page.teamRounds?.length ? page.teamRounds : schedule.teamRounds,
     url: page.url || schedule.url,
@@ -530,7 +541,8 @@ function liveEventToTournament(
 ): Tournament {
   live = salvageTeamFromSnippet(live, program.name);
   const flags = canceledRoundFlags(live);
-  const scores = liveScoresToRows(program, live, 72);
+  const par = resolvePar(live);
+  const scores = liveScoresToRows(program, live, par);
   const dates = live.dates || "TBA";
   const teamRounds = applyCanceledRounds(live.teamRounds ?? [], flags);
   const hasPosted =
@@ -547,7 +559,7 @@ function liveEventToTournament(
     name: live.name || "Unnamed tournament",
     dates,
     venue: formatVenue(live),
-    par: 72,
+    par,
     fieldTeams: live.teamStandings?.length || null,
     fieldPlayers: null,
     status: eventStatusFromDates(dates, hasPosted, new Date(), {
@@ -594,7 +606,8 @@ function mergeOne(
   const liveEvent = salvageTeamFromSnippet(live as LiveTournament, program.name);
   const base = curated as Tournament;
   const flags = canceledRoundFlags(liveEvent);
-  const liveRows = liveScoresToRows(program, liveEvent, base.par);
+  const par = resolvePar(liveEvent, base.par);
+  const liveRows = liveScoresToRows(program, liveEvent, par);
   const liveHasPosted =
     liveRows.some((s) => s.rounds.some((r) => r != null)) || liveEvent.teamTotal != null;
   const liveHasLineup = liveRows.length > 0;
@@ -619,6 +632,7 @@ function mergeOne(
     name: base.name,
     dates,
     venue: base.venue || formatVenue(liveEvent),
+    par,
     status: eventStatusFromDates(dates, hasScores, new Date(), {
       scoreboardLive: liveEvent.scoreboardLive,
       hasLineup: scores.length > 0,

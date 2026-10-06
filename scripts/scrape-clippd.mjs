@@ -61,13 +61,66 @@ async function httpGet(url) {
   return { status: res.status, text, ok: res.ok };
 }
 
+function decodeEntities(s) {
+  let text = String(s || "");
+  const named = {
+    amp: "&",
+    lt: "<",
+    gt: ">",
+    quot: '"',
+    apos: "'",
+    nbsp: " ",
+    rsquo: "'",
+    lsquo: "'",
+  };
+  for (let i = 0; i < 2; i += 1) {
+    text = text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, n) => {
+      const key = String(n).toLowerCase();
+      if (named[key]) return named[key];
+      if (key.startsWith("#x")) return String.fromCharCode(parseInt(key.slice(2), 16));
+      if (key.startsWith("#")) return String.fromCharCode(Number(key.slice(1)));
+      return m;
+    });
+  }
+  return text.replace(/[\u2018\u2019\u02BC]/g, "'");
+}
+
+function isPlayerName(line) {
+  return /^[A-Z][A-Za-z.'’\u2019\-]+(?:\s+[A-Z][A-Za-z.'’\u2019\-]+)+$/.test(
+    decodeEntities(line).trim(),
+  );
+}
+
+function parseCoursePar(html) {
+  if (!html) return null;
+  const votes = new Map();
+  const re = /totalPar\\?":\[([0-9,]+)\]/g;
+  let m;
+  while ((m = re.exec(html))) {
+    const first = m[1]
+      .split(",")
+      .map((n) => parseInt(n, 10))
+      .find((n) => n >= 67 && n <= 75);
+    if (first) votes.set(first, (votes.get(first) || 0) + 1);
+  }
+  let best = null;
+  let bestN = 0;
+  for (const [par, n] of votes) {
+    if (n > bestN) {
+      best = par;
+      bestN = n;
+    }
+  }
+  return best;
+}
+
 function htmlToLines(html) {
   let text = html.replace(/<script[\s\S]*?<\/script>/gi, " ");
   text = text.replace(/<style[\s\S]*?<\/style>/gi, " ");
   text = text.replace(/<[^>]+>/g, "\n");
   return text
     .split("\n")
-    .map((l) => l.replace(/\s+/g, " ").trim())
+    .map((l) => decodeEntities(l).replace(/\s+/g, " ").trim())
     .filter(Boolean);
 }
 
@@ -373,11 +426,10 @@ function isCanceledToken(t) {
 
 function parsePlayerStrokeBoard(html, focusTeam) {
   const lines = htmlToLines(html);
-  const nameRe = /^[A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+)+$/;
   const players = [];
   let i = 0;
   while (i < lines.length - 4) {
-    if (nameRe.test(lines[i]) && teamNameMatch(lines[i + 1], focusTeam)) {
+    if (isPlayerName(lines[i]) && teamNameMatch(lines[i + 1], focusTeam)) {
       const name = lines[i];
       const teamLabel = lines[i + 1];
       let place = null;
@@ -492,6 +544,7 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
     teamStandings: [],
     error: null,
     rawSnippet: null,
+    par: null,
     fetchMode: "http-stroke",
   };
 
@@ -529,6 +582,8 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
       if (!result.venue) result.venue = m2.venue;
       result.players = parsePlayerStrokeBoard(playerRes.text, teamName).slice(0, 40);
       result.rawSnippet = `${result.rawSnippet || ""}\n---PLAYER---\n${stripHoleNoise(htmlToFlat(playerRes.text)).slice(0, 4000)}`.slice(0, 12000);
+      result.par = parseCoursePar(playerRes.text) || parseCoursePar(teamRes.text);
+      if (result.par) result.rawSnippet = `${result.rawSnippet}\nPAR:${result.par}`;
     }
 
     try {

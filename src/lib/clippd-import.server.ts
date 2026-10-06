@@ -1,6 +1,7 @@
 import type { Division, Player, Program, RecruitCommit, Year } from "@/data/types";
 import type { LiveTeam, LiveTournament } from "@/lib/live";
 import { eventMatchesProgramDivision, normalizeEventDivision } from "@/lib/division";
+import { decodeEntities, isPlayerName, parseCoursePar } from "@/lib/clippd-text";
 
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36";
@@ -68,7 +69,7 @@ function htmlToLines(html: string) {
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, "\n")
     .split("\n")
-    .map((l) => l.replace(/\s+/g, " ").trim())
+    .map((l) => decodeEntities(l).replace(/\s+/g, " ").trim())
     .filter(Boolean);
 }
 
@@ -154,12 +155,11 @@ function parseRoster(lines: string[], programId: string): Player[] {
   const start = lines.findIndex((l) => l === "School Year" || l === "Player");
   const slice = start >= 0 ? lines.slice(start + 1) : lines;
   const players: Player[] = [];
-  const nameRe = /^[A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+)+$/;
   for (let i = 0; i < slice.length - 1; i++) {
     const name = slice[i];
     const yearRaw = slice[i + 1];
     const yearKey = yearRaw.toLowerCase();
-    if (!nameRe.test(name) || !YEAR_MAP[yearKey]) continue;
+    if (!isPlayerName(name) || !YEAR_MAP[yearKey]) continue;
     if (/ranking|roster|schedule|scoreboard|clippd/i.test(name)) continue;
     players.push({
       id: `${programId}-${slug(name)}`,
@@ -240,11 +240,10 @@ function isCanceledToken(t: string) {
 
 function parsePlayerStrokeBoard(html: string, focusTeam: string) {
   const lines = htmlToLines(html);
-  const nameRe = /^[A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+)+$/;
   const players = [];
   let i = 0;
   while (i < lines.length - 4) {
-    if (nameRe.test(lines[i]) && namesMatch(lines[i + 1], focusTeam)) {
+    if (isPlayerName(lines[i]) && namesMatch(lines[i + 1], focusTeam)) {
       const name = lines[i];
       const teamLabel = lines[i + 1];
       let place: string | null = null;
@@ -315,6 +314,8 @@ async function scrapeTournament(tournamentId: string, teamName: string): Promise
     if (playerRes.ok) {
       out.players = parsePlayerStrokeBoard(playerRes.text, teamName).slice(0, 40);
     }
+    const par = parseCoursePar(playerRes.ok ? playerRes.text : teamRes.text);
+    if (par) out.par = par;
     if (out.players?.length) out.status = "complete";
   } catch (err) {
     out.error = String((err as Error).message || err);
