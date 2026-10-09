@@ -2,6 +2,7 @@ import type { Division, Player, Program, RecruitCommit, Year } from "@/data/type
 import type { LiveTeam, LiveTournament } from "@/lib/live";
 import { eventMatchesProgramDivision, normalizeEventDivision } from "@/lib/division";
 import { decodeEntities, isPlayerName, parseCoursePar } from "@/lib/clippd-text";
+import { trimStrokeRounds } from "@/lib/stroke-rounds";
 
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36";
@@ -114,12 +115,14 @@ function nameTokens(name: string) {
 }
 
 function namesMatch(a: string, b: string) {
-  const ta = nameTokens(a);
-  const tb = nameTokens(b);
-  if (!ta.length || !tb.length) return false;
+  const drop = new Set(["university", "college", "of", "the"]);
+  const core = (s: string) =>
+    nameTokens(s.replace(/\(ind\)/gi, " ")).filter((t) => !drop.has(t));
+  const ta = core(a);
+  const tb = core(b);
+  if (!ta.length || !tb.length || ta.length !== tb.length) return false;
   const sa = new Set(ta);
-  const overlap = tb.filter((t) => sa.has(t)).length;
-  return overlap >= Math.min(2, Math.min(ta.length, tb.length)) || overlap >= Math.min(ta.length, tb.length);
+  return tb.every((t) => sa.has(t));
 }
 
 function lineValue(lines: string[], label: string): string {
@@ -271,14 +274,17 @@ function parsePlayerStrokeBoard(html: string, focusTeam: string) {
       } else {
         roundToks = tokens.filter((t) => /^\d{2,3}$/.test(t) || isCanceledToken(t) || t === "-");
       }
-      const rounds = roundToks.map((t) => {
-        if (isCanceledToken(t) || t === "-") return null;
-        if (/^\d{2,3}$/.test(t)) {
-          const n = parseInt(t, 10);
-          return n >= 50 && n <= 120 ? n : null;
-        }
-        return null;
-      });
+      const rounds = trimStrokeRounds(
+        roundToks.map((t) => {
+          if (isCanceledToken(t) || t === "-") return null;
+          if (/^\d{2,3}$/.test(t)) {
+            const n = parseInt(t, 10);
+            return n >= 50 && n <= 120 ? n : null;
+          }
+          return null;
+        }),
+        total,
+      );
       players.push({
         name,
         rounds,
@@ -507,7 +513,7 @@ export async function importCollegeFromClippd(
     clippdSchedule: scheduleUrl,
     rosterUrl,
     seniors: seniors || null,
-    intel: `Added from Clippd team ${clippdId}. Roster years come from Clippd; use Refresh scores for new cards. The 6am GitHub job still follows the shared watchlist — pin this school there if you want it updated for everyone.`,
+    intel: `Added from Clippd team ${clippdId}. Roster years come from Clippd. The daily scrape follows this school once it is pinned, so the next run keeps the cards current.`,
     players,
     events: [],
     insights: [

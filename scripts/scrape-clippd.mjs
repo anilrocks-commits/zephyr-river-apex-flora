@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Clippd college golf scraper (v5.4)
+ * Clippd college golf scraper (v5.5)
  * --------------------------------
  * HTTP + Chrome UA stroke boards. Visit live/past events AND boards
  * whose tee time is within 48h so confirmed lineups land before round 1.
@@ -16,8 +16,10 @@ const ROOT = join(__dirname, "..");
 const OUT_DIR = join(ROOT, "public", "data");
 const OUT_FILE = join(OUT_DIR, "live-results.json");
 
-import { CLIPPD_TEAMS as TEAMS } from "./watchlist.mjs";
+import { loadTeams } from "./watchlist.mjs";
+import { trimStrokeRounds } from "./stroke-rounds.mjs";
 
+const TEAMS = loadTeams().filter((t) => t.clippdId);
 const MAX_TOURNAMENTS_PER_TEAM = 8;
 const HEADFUL = process.argv.includes("--headful");
 const RECENT_ONLY = process.argv.includes("--recent");
@@ -254,15 +256,14 @@ function namesMatch(a, b) {
 }
 
 function teamNameMatch(rowTeam, focusTeam) {
-  const a = String(rowTeam || "").toLowerCase();
-  const b = String(focusTeam || "").toLowerCase();
-  if (!a || !b) return false;
-  if (a.includes(b) || b.includes(a)) return true;
-  const ta = nameTokens(a);
-  const tb = nameTokens(b);
+  const drop = new Set(["university", "college", "of", "the"]);
+  const core = (s) =>
+    nameTokens(String(s || "").replace(/\(ind\)/gi, " ")).filter((t) => !drop.has(t));
+  const ta = core(rowTeam);
+  const tb = core(focusTeam);
+  if (!ta.length || !tb.length || ta.length !== tb.length) return false;
   const sa = new Set(ta);
-  const overlap = tb.filter((t) => sa.has(t)).length;
-  return overlap >= Math.min(2, tb.length);
+  return tb.every((t) => sa.has(t));
 }
 
 function attachIds(schedule, links) {
@@ -466,14 +467,17 @@ function parsePlayerStrokeBoard(html, focusTeam) {
         roundToks = tokens.filter((t) => /^\d{2,3}$/.test(t) || isCanceledToken(t) || t === "-");
       }
 
-      const rounds = roundToks.map((t) => {
-        if (isCanceledToken(t) || t === "-") return null;
-        if (/^\d{2,3}$/.test(t)) {
-          const n = parseInt(t, 10);
-          return n >= 50 && n <= 120 ? n : null;
-        }
-        return null;
-      });
+      const rounds = trimStrokeRounds(
+        roundToks.map((t) => {
+          if (isCanceledToken(t) || t === "-") return null;
+          if (/^\d{2,3}$/.test(t)) {
+            const n = parseInt(t, 10);
+            return n >= 50 && n <= 120 ? n : null;
+          }
+          return null;
+        }),
+        total,
+      );
 
       if (total == null) {
         const played = rounds.filter((n) => n != null);
@@ -618,10 +622,27 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
           result.status = "live";
         }
         if (data.division) result.division = normalizeEventDivision(data.division) || data.division;
+        const planned = Number(data.numRounds || data.plannedRounds);
+        if (planned >= 1 && planned <= 4) {
+          result.roundsPlanned = planned;
+          result.players = (result.players || []).map((p) => ({
+            ...p,
+            rounds: trimStrokeRounds(p.rounds, p.total, planned),
+          }));
+          result.teamRounds = trimStrokeRounds(result.teamRounds, result.teamTotal, planned);
+        } else {
+          result.teamRounds = trimStrokeRounds(result.teamRounds, result.teamTotal);
+        }
       }
     } catch {
       /* optional */
     }
+
+    result.teamRounds = trimStrokeRounds(
+      result.teamRounds,
+      result.teamTotal,
+      result.roundsPlanned,
+    );
 
     const hasPosted =
       (result.players || []).some((p) => (p.rounds || []).some((r) => r != null)) ||
@@ -856,7 +877,7 @@ async function scrapeTeam(page, team) {
 }
 
 async function main() {
-  console.log("Clippd scraper v5.4 starting…");
+  console.log("Clippd scraper v5.5 starting…");
   console.log(
     `  mode=http-stroke  headful=${HEADFUL} recent=${RECENT_ONLY} teams=${TEAMS.length}`,
   );
@@ -918,7 +939,7 @@ async function main() {
       successCount: Object.values(teams).filter((t) => !t.error).length,
       tournamentPagesVisited: allTournaments.length,
       tournamentsWithScores: withScores.length,
-      note: "v5.4: drop NAIA/NJCAA from NCAA schedules; visit boards 48h before tee; capture confirmed lineups before round 1.",
+      note: "v5.5: rounds stop at the scorecard total (no points column in R4/R5); extra watchlist schools from public/data/extra-teams.json.",
     },
   };
 

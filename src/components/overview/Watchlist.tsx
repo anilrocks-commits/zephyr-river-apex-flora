@@ -2,11 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { openingForecast, opportunityScore, allMetrics } from "@/lib/model";
 import { formatScraped } from "@/lib/live";
 import { useWatchlist } from "@/lib/watchlist";
+import { useIntelStore } from "@/lib/store";
 import { Badge } from "@/components/ui/badge";
 import { AddCollege } from "@/components/overview/AddCollege";
 
 export function Watchlist() {
-  const programs = useWatchlist();
+  const hiddenIds = useIntelStore((s) => s.hiddenIds);
+  const programs = useWatchlist().filter((p) => !hiddenIds.includes(p.id));
   const ranked = [...programs].sort(
     (a, b) => opportunityScore(b) - opportunityScore(a),
   );

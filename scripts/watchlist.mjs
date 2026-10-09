@@ -1,9 +1,13 @@
 /**
  * Single roster of watchlist programs for the daily scrapers.
- * Adding a college: append a row here (aliases for College Golf Commits
- * matching, clippdId if Clippd has a team page). Curated intel still
- * lives in src/data/programs.ts — this file is scrape identity only.
+ * Built-in schools live in TEAMS. Colleges added from the webapp are
+ * pinned into public/data/extra-teams.json and merged here.
  */
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 export const TEAMS = [
   {
     id: "siu",
@@ -92,3 +96,45 @@ export const TEAMS = [
 ];
 
 export const CLIPPD_TEAMS = TEAMS.filter((t) => t.clippdId);
+
+export function mergeTeams(base, extra) {
+  const seen = new Set(base.map((t) => t.clippdId).filter(Boolean).map(String));
+  const ids = new Set(base.map((t) => t.id));
+  const merged = [...base];
+  for (const t of extra || []) {
+    if (!t?.clippdId || !t?.name || !t?.id) continue;
+    const clippdId = String(t.clippdId);
+    const id = String(t.id);
+    if (seen.has(clippdId) || ids.has(id)) continue;
+    seen.add(clippdId);
+    ids.add(id);
+    merged.push({
+      id,
+      name: String(t.name),
+      div: t.div === "D3" ? "D3" : t.div === "D2" ? "D2" : "D1",
+      clippdId,
+      rosterUrl: t.rosterUrl || `https://scoreboard.clippd.com/teams/${clippdId}/roster`,
+      aliases:
+        Array.isArray(t.aliases) && t.aliases.length
+          ? t.aliases.map((a) => String(a).toLowerCase())
+          : [String(t.name).toLowerCase()],
+    });
+  }
+  return merged;
+}
+
+export function loadExtraTeams() {
+  try {
+    const raw = JSON.parse(
+      readFileSync(join(__dirname, "../public/data/extra-teams.json"), "utf8"),
+    );
+    const list = Array.isArray(raw) ? raw : raw.teams || [];
+    return list;
+  } catch {
+    return [];
+  }
+}
+
+export function loadTeams() {
+  return mergeTeams(TEAMS, loadExtraTeams());
+}

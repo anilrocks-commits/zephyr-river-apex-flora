@@ -8,11 +8,16 @@ interface IntelState {
   starred: string[];
   customPrograms: Program[];
   customLive: Record<string, LiveTeam>;
+  navOrder: string[];
+  hiddenIds: string[];
   hasHydrated: boolean;
   setNote: (playerId: string, note: string) => void;
   toggleStar: (programId: string) => void;
   addCustomProgram: (program: Program, live?: LiveTeam) => void;
   removeCustomProgram: (programId: string) => void;
+  setNavOrder: (ids: string[]) => void;
+  hideProgram: (programId: string) => void;
+  restoreProgram: (programId: string) => void;
   setHydrated: () => void;
 }
 
@@ -23,6 +28,8 @@ export const useIntelStore = create<IntelState>()(
       starred: [],
       customPrograms: [],
       customLive: {},
+      navOrder: [],
+      hiddenIds: [],
       hasHydrated: false,
       setNote: (playerId, note) =>
         set({ notes: { ...get().notes, [playerId]: note } }),
@@ -49,8 +56,19 @@ export const useIntelStore = create<IntelState>()(
           customPrograms: get().customPrograms.filter((p) => p.id !== programId),
           customLive,
           starred: get().starred.filter((id) => id !== programId),
+          navOrder: get().navOrder.filter((id) => id !== programId),
+          hiddenIds: get().hiddenIds.filter((id) => id !== programId),
         });
       },
+      setNavOrder: (ids) => set({ navOrder: ids }),
+      hideProgram: (programId) => {
+        const hiddenIds = get().hiddenIds.includes(programId)
+          ? get().hiddenIds
+          : [...get().hiddenIds, programId];
+        set({ hiddenIds });
+      },
+      restoreProgram: (programId) =>
+        set({ hiddenIds: get().hiddenIds.filter((id) => id !== programId) }),
       setHydrated: () => set({ hasHydrated: true }),
     }),
     {
@@ -60,6 +78,8 @@ export const useIntelStore = create<IntelState>()(
         starred: s.starred,
         customPrograms: s.customPrograms,
         customLive: s.customLive,
+        navOrder: s.navOrder,
+        hiddenIds: s.hiddenIds,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated();

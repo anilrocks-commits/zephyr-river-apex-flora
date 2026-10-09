@@ -31,6 +31,7 @@ import { isSeniorYear } from "@/lib/format";
 import { formatScraped } from "@/lib/live";
 import { SCRAPED_COMMITS } from "@/lib/commits";
 import { hydrateProgram } from "@/lib/watchlist";
+import { syncWatchlist } from "@/lib/pin-watchlist";
 import { useIntelStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -127,6 +128,9 @@ export function TeamView({ program: rawProgram }: { program: Program }) {
                 variant="ghost"
                 size="sm"
                 onClick={() => {
+                  syncWatchlist({
+                    remove: [{ id: program.id, clippdId: program.clippdTeamId }],
+                  });
                   removeCustomProgram(program.id);
                   void navigate({ to: "/" });
                 }}

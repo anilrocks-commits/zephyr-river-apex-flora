@@ -42,7 +42,7 @@ export function TournamentCard({
     ...event.scores.map((s) => lastFilled(s.rounds)),
     -1,
   );
-  const roundCount = Math.max(lastPlayed, lastCanceled, 0) + 1;
+  const roundCount = Math.min(4, Math.max(lastPlayed, lastCanceled, 0) + 1);
   const roundLabels = Array.from({ length: roundCount }, (_, i) => `R${i + 1}`);
 
   const nextUp = nextUpcomingEvent(program);

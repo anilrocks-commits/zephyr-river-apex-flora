@@ -14,6 +14,7 @@ import {
   normalizeEventDivision,
 } from "@/lib/division";
 import { parseCoursePar } from "@/lib/clippd-text";
+import { trimStrokeRounds } from "@/lib/stroke-rounds";
 
 export interface LivePlayerScore {
   name: string;
@@ -45,6 +46,7 @@ export interface LiveTournament {
   hasResults?: boolean;
   isComplete?: boolean;
   par?: number | null;
+  roundsPlanned?: number | null;
 }
 
 export interface LiveTeam {
@@ -427,7 +429,11 @@ function liveScoresToRows(program: Program, live: LiveTournament, par?: number):
     const matched = matchPlayer(program.players, p.name);
     const role: Role = p.role === "ind" ? "ind" : p.role === "dnp" ? "dnp" : "team";
     const raw = (p.rounds ?? []).map((r) => (Number.isFinite(r) ? r : null));
-    const rounds = applyCanceledRounds(raw, flags);
+    const rounds = trimStrokeRounds(
+      applyCanceledRounds(raw, flags),
+      typeof p.total === "number" ? p.total : null,
+      live.roundsPlanned,
+    );
     const toPar =
       parseToPar(p.toPar) ??
       (par
@@ -544,7 +550,11 @@ function liveEventToTournament(
   const par = resolvePar(live);
   const scores = liveScoresToRows(program, live, par);
   const dates = live.dates || "TBA";
-  const teamRounds = applyCanceledRounds(live.teamRounds ?? [], flags);
+  const teamRounds = trimStrokeRounds(
+    applyCanceledRounds(live.teamRounds ?? [], flags),
+    live.teamTotal ?? null,
+    live.roundsPlanned,
+  );
   const hasPosted =
     scores.some((s) => s.rounds.some((r) => r != null)) || live.teamTotal != null;
   const hasLineup = scores.length > 0;
@@ -613,9 +623,13 @@ function mergeOne(
   const liveHasLineup = liveRows.length > 0;
   const scores = liveHasPosted || liveHasLineup ? liveRows : base.scores;
   const dates = liveEvent.dates || base.dates;
-  const teamRounds = applyCanceledRounds(
-    liveEvent.teamRounds?.length ? liveEvent.teamRounds : base.teamRounds,
-    flags,
+  const teamRounds = trimStrokeRounds(
+    applyCanceledRounds(
+      liveEvent.teamRounds?.length ? liveEvent.teamRounds : base.teamRounds,
+      flags,
+    ),
+    liveEvent.teamTotal ?? base.teamTotal,
+    liveEvent.roundsPlanned,
   );
   const hasScores = hasPostedScores({
     ...base,
@@ -755,6 +769,16 @@ function sortEvents(events: Tournament[]): Tournament[] {
     if (ra[0] !== rb[0]) return ra[0] - rb[0];
     return ra[1] - rb[1];
   });
+}
+
+export function findSharedLiveTeam(
+  programId: string,
+  clippdId?: string | null,
+): LiveTeam | undefined {
+  const teams = LIVE_RESULTS?.teams || {};
+  if (teams[programId]) return teams[programId];
+  if (!clippdId) return undefined;
+  return Object.values(teams).find((t) => String(t.clippdId) === String(clippdId));
 }
 
 export function withLiveResults(

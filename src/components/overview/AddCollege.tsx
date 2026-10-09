@@ -95,9 +95,9 @@ export function AddCollege() {
             </Button>
           </div>
           <p className="text-[11px] text-subtle">
-            Saved in this browser. Use Refresh on the team page for new cards.
-            Pin a school in the shared watchlist if you want the 6am GitHub job
-            to keep it updated for everyone.
+            Saved in this browser and pinned for the daily Clippd scrape, so the
+            next run keeps scores current. Use Edit list on the left to reorder
+            or remove a school.
           </p>
         </form>
       ) : null}

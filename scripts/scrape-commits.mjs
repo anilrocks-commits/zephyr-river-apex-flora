@@ -4,13 +4,15 @@
  *
  * Primary source: collegegolfcommits.com (player announcements).
  * Secondary: athletics news archives (official signing-class posts).
- * Runs for every team in scripts/watchlist.mjs — adding a college there
- * is enough for the next daily pass to pick up new verbals.
+ * Runs for every team in scripts/watchlist.mjs plus schools pinned from
+ * the webapp (public/data/extra-teams.json).
  */
 import { writeFileSync, mkdirSync, existsSync, readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import { TEAMS } from "./watchlist.mjs";
+import { loadTeams } from "./watchlist.mjs";
+
+const TEAMS = loadTeams();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");

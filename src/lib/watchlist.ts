@@ -1,7 +1,7 @@
 import { PROGRAMS } from "@/data/programs";
 import type { Program } from "@/data/types";
 import { withCommits } from "@/lib/commits";
-import { withLiveResults, type LiveTeam } from "@/lib/live";
+import { findSharedLiveTeam, withLiveResults, type LiveTeam } from "@/lib/live";
 import { useIntelStore } from "@/lib/store";
 
 function clippdIdOf(p: Program): string | null {
@@ -15,12 +15,24 @@ export function mergeWatchlist(builtIn: Program[], custom: Program[]): Program[]
   return [...builtIn, ...extras];
 }
 
+function newerLive(a?: LiveTeam, b?: LiveTeam): LiveTeam | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  const ta = Date.parse(a.scrapedAt || "") || 0;
+  const tb = Date.parse(b.scrapedAt || "") || 0;
+  return ta >= tb ? a : b;
+}
+
 export function hydrateProgram(
   program: Program,
   customLive: Record<string, LiveTeam> = {},
 ): Program {
-  if (program.custom && customLive[program.id]) {
-    const live = customLive[program.id];
+  const local = program.custom ? customLive[program.id] : undefined;
+  const shared = program.custom
+    ? findSharedLiveTeam(program.id, clippdIdOf(program))
+    : undefined;
+  const live = newerLive(shared, local);
+  if (program.custom && live) {
     return withCommits(
       withLiveResults(program, {
         scrapedAt: live.scrapedAt || "",

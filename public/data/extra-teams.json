@@ -1,0 +1,53 @@
+{
+  "teams": [
+    {
+      "id": "cal-poly",
+      "name": "Cal Poly",
+      "div": "D1",
+      "clippdId": "3787",
+      "aliases": ["cal poly", "california polytechnic", "california polytechnic state university"]
+    },
+    {
+      "id": "temple",
+      "name": "Temple",
+      "div": "D1",
+      "clippdId": "3277",
+      "aliases": ["temple", "temple university"]
+    },
+    {
+      "id": "eastern-michigan",
+      "name": "Eastern Michigan",
+      "div": "D1",
+      "clippdId": "4107",
+      "aliases": ["eastern michigan", "eastern michigan university"]
+    },
+    {
+      "id": "washington",
+      "name": "Washington",
+      "div": "D1",
+      "clippdId": "4192",
+      "aliases": ["washington", "university of washington"]
+    },
+    {
+      "id": "loyola-maryland",
+      "name": "Loyola Maryland",
+      "div": "D1",
+      "clippdId": "3003",
+      "aliases": ["loyola maryland", "loyola university maryland"]
+    },
+    {
+      "id": "western-carolina",
+      "name": "Western Carolina",
+      "div": "D1",
+      "clippdId": "2132",
+      "aliases": ["western carolina", "western carolina university"]
+    },
+    {
+      "id": "texas-state",
+      "name": "Texas State",
+      "div": "D1",
+      "clippdId": "2485",
+      "aliases": ["texas state", "texas state university"]
+    }
+  ]
+}

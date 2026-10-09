@@ -1,5 +1,6 @@
 import { defineEventHandler, readBody, createError } from "h3";
 import { importCollegeFromClippd, parseClippdTeamId } from "../../src/lib/clippd-import.server";
+import { pinExtraTeams } from "../../src/lib/extra-teams.server";
 
 export default defineEventHandler(async (event) => {
   const body = (await readBody(event)) as {
@@ -21,7 +22,23 @@ export default defineEventHandler(async (event) => {
       body?.takenIds || [],
       body?.refresh ? [] : body?.takenClippdIds || [],
     );
-    return imported;
+    let pinned = false;
+    if (imported.program.clippdTeamId) {
+      try {
+        const pin = await pinExtraTeams([
+          {
+            id: imported.program.id,
+            name: imported.program.name,
+            div: imported.program.div,
+            clippdId: imported.program.clippdTeamId,
+          },
+        ]);
+        pinned = pin.ok;
+      } catch {
+        pinned = false;
+      }
+    }
+    return { ...imported, pinned };
   } catch (err) {
     throw createError({
       statusCode: 502,
