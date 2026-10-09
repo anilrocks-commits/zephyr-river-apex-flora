@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-10-08T13:07:45.530Z",
+  "scrapedAt": "2026-10-09T12:55:00.849Z",
   "classYear": 2027,
   "source": "collegegolfcommits.com + athletics news",
   "teams": {
@@ -140,6 +140,115 @@
           "source": "College Golf Commits",
           "sourceUrl": "https://collegegolfcommits.com/2027boysd3",
           "note": ""
+        }
+      ]
+    },
+    "cal-poly": {
+      "id": "cal-poly",
+      "name": "Cal Poly",
+      "commits": [
+        {
+          "id": "cal-poly-c-calvin-etcheverry",
+          "name": "Calvin Etcheverry",
+          "classYear": 2027,
+          "hometown": "Pebble Beach, CA",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1c",
+          "note": "One JTNC Win and two Top 5s in 2025/26; One NorCal Cup Win and one Top 5 in 2025/26; Three AJGA top 15 in 2025/26"
+        },
+        {
+          "id": "cal-poly-c-grant-curtiss",
+          "name": "Grant Curtiss",
+          "classYear": 2027,
+          "hometown": "Menlo Park, CA",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1c",
+          "note": "One JGANC win and one JGAA win in 2025; 2025 Saguaro Junior Amateur: 12th"
+        },
+        {
+          "id": "cal-poly-c-lee-smith",
+          "name": "Lee Smith",
+          "classYear": 2027,
+          "hometown": "Marietta, GA",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1c",
+          "note": "One AJGA win &amp; one top-10 finish in 2025; Two SJGT wins in 2025"
+        }
+      ]
+    },
+    "temple": {
+      "id": "temple",
+      "name": "Temple",
+      "commits": []
+    },
+    "eastern-michigan": {
+      "id": "eastern-michigan",
+      "name": "Eastern Michigan",
+      "commits": [
+        {
+          "id": "eastern-michigan-c-markus-marelsson",
+          "name": "Markus Marelsson",
+          "classYear": 2027,
+          "hometown": "Iceland",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1de",
+          "note": "Three top-5 finishes in Iceland Junior events in 2025; Two junior wins in Denmark in 2025"
+        }
+      ]
+    },
+    "washington": {
+      "id": "washington",
+      "name": "Washington",
+      "commits": []
+    },
+    "loyola-maryland": {
+      "id": "loyola-maryland",
+      "name": "Loyola Maryland",
+      "commits": []
+    },
+    "western-carolina": {
+      "id": "western-carolina",
+      "name": "Western Carolina",
+      "commits": [
+        {
+          "id": "western-carolina-c-charles-snider",
+          "name": "Charles Snider",
+          "classYear": 2027,
+          "hometown": "Memphis, TN",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1wz",
+          "note": "Two AJGA top-10 finishes in 2025-2025; 2026 Sneds Tour Elite at Greystone champion"
+        },
+        {
+          "id": "western-carolina-c-tyler-warmer",
+          "name": "Tyler Warmer",
+          "classYear": 2027,
+          "hometown": "Marvin, NC",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1wz",
+          "note": "2025 Hope valley junior invitational:2nd place; 2025 Donald RossJr championship: 5th; 2026 AJGA Visit Williamsburg Jr championship: 9th"
+        }
+      ]
+    },
+    "texas-state": {
+      "id": "texas-state",
+      "name": "Texas State",
+      "commits": [
+        {
+          "id": "texas-state-c-arian-rodriguez",
+          "name": "Arian Rodriguez",
+          "classYear": 2027,
+          "hometown": "Spain",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1tv",
+          "note": "2024 Alps Tour (Professional Tour), Roquetas de Mar: 10th; 2023 and 2025 Spanish Inter-Regional Champion"
         }
       ]
     }
