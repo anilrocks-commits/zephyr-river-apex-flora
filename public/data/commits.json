@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-10-10T12:13:08.511Z",
+  "scrapedAt": "2026-10-11T12:27:20.962Z",
   "classYear": 2027,
   "source": "collegegolfcommits.com + athletics news",
   "teams": {
@@ -109,6 +109,16 @@
           "source": "College Golf Commits",
           "sourceUrl": "https://collegegolfcommits.com/2027boysd1m",
           "note": "2026 NJPGA Garden State Jr Shootout: 3rd"
+        },
+        {
+          "id": "man-c-reece-williams",
+          "name": "Reece Williams",
+          "classYear": 2027,
+          "hometown": "Beaumont, TX",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1m",
+          "note": "2026 STPGA Vortech Contracting HTown Showdown champion; 2026 BZF Invitational Qualifier champion; Uswing Mojing Jr Worlds Qualifer champion"
         }
       ]
     },
