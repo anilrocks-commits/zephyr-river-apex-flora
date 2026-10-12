@@ -22,6 +22,8 @@ export interface PlayerRound {
   toPar: number | null;
   finish: string | null;
   counted: (boolean | null)[];
+  /** Set when the last posted round is still on the course, e.g. "12". */
+  thru?: string | null;
 }
 
 export interface Tournament {
@@ -37,6 +39,8 @@ export interface Tournament {
   teamRounds: (number | null)[];
   teamTotal: number | null;
   teamToPar: number | null;
+  /** Hole span when the team round is still in progress, e.g. "12-17". */
+  teamThru?: string | null;
   scores: PlayerRound[];
   source: SourceKind;
   sourceLabel: string;

@@ -28,11 +28,13 @@ export function RoundCell({
   par,
   counted,
   canceled,
+  liveThru,
 }: {
   score: number | null | undefined;
   par: number;
   counted: boolean | null | undefined;
   canceled?: boolean;
+  liveThru?: string | null;
 }) {
   if (canceled) {
     return (
@@ -43,6 +45,14 @@ export function RoundCell({
   }
   if (score == null) {
     return <span className="font-mono text-subtle">—</span>;
+  }
+  if (liveThru) {
+    return (
+      <span className="inline-flex flex-col font-mono tabular-nums text-fg" title={`Through ${liveThru}`}>
+        <span>{formatRound(score)}</span>
+        <span className="text-[10px] font-sans uppercase tracking-wide text-subtle">thru {liveThru}</span>
+      </span>
+    );
   }
   const rel = score - par;
   const tone = rel < 0 ? "text-under" : rel > 0 ? "text-over" : "text-fg";

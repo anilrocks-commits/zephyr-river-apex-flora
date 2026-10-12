@@ -141,6 +141,7 @@ export function TournamentCard({
                             par={event.par}
                             counted={row.counted[i]}
                             canceled={Boolean(canceled[i])}
+                            liveThru={row.thru && i === row.rounds.length - 1 ? row.thru : null}
                           />
                         </td>
                       ))}
@@ -229,6 +230,9 @@ function TeamLine({
           key={label}
           label={label}
           value={canceled[i] ? "CNCL" : (event.teamRounds[i] ?? "—")}
+          hint={
+            event.teamThru && i === event.teamRounds.length - 1 ? `thru ${event.teamThru}` : undefined
+          }
         />
       ))}
       <Stat label="Total" value={event.teamTotal ?? "—"} />
@@ -242,10 +246,12 @@ function Stat({
   label,
   value,
   par,
+  hint,
 }: {
   label: string;
   value: string | number;
   par?: boolean;
+  hint?: string;
 }) {
   const n = typeof value === "number" ? value : null;
   return (
@@ -256,6 +262,7 @@ function Stat({
       ) : (
         <div className="font-mono text-base tabular-nums text-fg">{value}</div>
       )}
+      {hint ? <div className="text-[10px] uppercase tracking-wide text-subtle">{hint}</div> : null}
     </div>
   );
 }

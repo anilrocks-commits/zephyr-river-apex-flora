@@ -23,6 +23,8 @@ export interface LivePlayerScore {
   toPar?: string | number | null;
   finish?: string | null;
   role?: Role | string | null;
+  /** Hole the player is on when the latest round is not finished. */
+  thru?: string | null;
 }
 
 export interface LiveTournament {
@@ -36,6 +38,7 @@ export interface LiveTournament {
   teamTotal?: number | null;
   teamToPar?: string | number | null;
   teamRounds?: (number | null)[];
+  teamThru?: string | null;
   players?: LivePlayerScore[];
   teamStandings?: { place?: string; team?: string }[];
   error?: string | null;
@@ -429,16 +432,19 @@ function liveScoresToRows(program: Program, live: LiveTournament, par?: number):
     const matched = matchPlayer(program.players, p.name);
     const role: Role = p.role === "ind" ? "ind" : p.role === "dnp" ? "dnp" : "team";
     const raw = (p.rounds ?? []).map((r) => (Number.isFinite(r) ? r : null));
-    const rounds = trimStrokeRounds(
-      applyCanceledRounds(raw, flags),
-      typeof p.total === "number" ? p.total : null,
-      live.roundsPlanned,
-    );
+    const rounds = p.thru
+      ? applyCanceledRounds(raw, flags)
+      : trimStrokeRounds(
+          applyCanceledRounds(raw, flags),
+          typeof p.total === "number" ? p.total : null,
+          live.roundsPlanned,
+        );
     const toPar =
       parseToPar(p.toPar) ??
       (par
-        ? rounds.reduce<number | null>((acc, r) => {
+        ? rounds.reduce<number | null>((acc, r, i) => {
             if (r == null) return acc;
+            if (p.thru && i === rounds.length - 1) return acc;
             return (acc ?? 0) + (r - par);
           }, null)
         : null);
@@ -449,10 +455,29 @@ function liveScoresToRows(program: Program, live: LiveTournament, par?: number):
       rounds,
       toPar,
       finish: p.finish ?? null,
+      thru: p.thru || null,
       counted: rounds.map(() => null),
     };
   });
-  return inferCounted(rows);
+  return clearLiveCounted(inferCounted(rows));
+}
+
+function clearLiveCounted(rows: PlayerRound[]): PlayerRound[] {
+  const live = new Set<number>();
+  for (const row of rows) {
+    if (!row.thru) continue;
+    for (let i = row.rounds.length - 1; i >= 0; i -= 1) {
+      if (row.rounds[i] != null) {
+        live.add(i);
+        break;
+      }
+    }
+  }
+  if (!live.size) return rows;
+  return rows.map((row) => ({
+    ...row,
+    counted: row.counted.map((c, i) => (live.has(i) ? null : c)),
+  }));
 }
 
 function inferCounted(rows: PlayerRound[]): PlayerRound[] {
@@ -580,6 +605,7 @@ function liveEventToTournament(
     teamRounds,
     teamTotal: playedTotal(teamRounds, live.teamTotal ?? null),
     teamToPar: parseToPar(live.teamToPar),
+    teamThru: live.teamThru || null,
     scores,
     source: "clippd",
     sourceLabel: hasPosted
@@ -656,6 +682,7 @@ function mergeOne(
     teamRounds,
     teamTotal: playedTotal(teamRounds, liveEvent.teamTotal ?? base.teamTotal),
     teamToPar: parseToPar(liveEvent.teamToPar) ?? base.teamToPar,
+    teamThru: liveEvent.teamThru || base.teamThru || null,
     fieldTeams: liveEvent.teamStandings?.length || base.fieldTeams,
     scores,
     source: liveHasPosted ? "clippd" : liveHasLineup ? "clippd" : base.source,

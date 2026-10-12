@@ -3,6 +3,7 @@ import type { LiveTeam, LiveTournament } from "@/lib/live";
 import { eventMatchesProgramDivision, normalizeEventDivision } from "@/lib/division";
 import { decodeEntities, isPlayerName, parseCoursePar } from "@/lib/clippd-text";
 import { trimStrokeRounds } from "@/lib/stroke-rounds";
+import { parseClippdBoard } from "../../scripts/clippd-board.mjs";
 
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36";
@@ -265,21 +266,28 @@ function parsePlayerStrokeBoard(html: string, focusTeam: string) {
           j += 1;
         } else break;
       }
+      const holeThru = tokens.length > 1 && /^(?:[1-9]|1[0-8])$/.test(tokens[1]) ? tokens[1] : null;
       const thruIdx = tokens.findIndex((t) => t === "F");
       let total: number | null = null;
       let roundToks: string[] = [];
-      if (thruIdx >= 1 && /^\d{2,4}$/.test(tokens[0])) {
+      let thru: string | null = null;
+      if (thruIdx === 1 && /^\d{2,4}$/.test(tokens[0])) {
         total = parseInt(tokens[0], 10);
         roundToks = tokens.slice(thruIdx + 1);
+      } else if (holeThru && /^\d{2,4}$/.test(tokens[0])) {
+        total = parseInt(tokens[0], 10);
+        thru = holeThru;
+        roundToks = tokens.slice(2);
       } else {
         roundToks = tokens.filter((t) => /^\d{2,3}$/.test(t) || isCanceledToken(t) || t === "-");
       }
       const rounds = trimStrokeRounds(
         roundToks.map((t) => {
           if (isCanceledToken(t) || t === "-") return null;
-          if (/^\d{2,3}$/.test(t)) {
+          if (/^\d{1,3}$/.test(t)) {
             const n = parseInt(t, 10);
-            return n >= 50 && n <= 120 ? n : null;
+            if (n >= 50 && n <= 120) return n;
+            if (thru && n > 0 && n < 50) return n;
           }
           return null;
         }),
@@ -291,6 +299,8 @@ function parsePlayerStrokeBoard(html: string, focusTeam: string) {
         total,
         finish: place,
         role: /\(IND\)/i.test(teamLabel) ? "ind" : "team",
+        thru,
+        toPar: null,
       });
       i = j;
       continue;
@@ -318,11 +328,26 @@ async function scrapeTournament(tournamentId: string, teamName: string): Promise
         /((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:\s*[-–]\s*(?:[A-Za-z]+\.?\s+)?\d{1,2})?,?\s*\d{4})/i,
       )?.[1] || null;
     if (playerRes.ok) {
-      out.players = parsePlayerStrokeBoard(playerRes.text, teamName).slice(0, 40);
+      const board = parseClippdBoard(playerRes.text);
+      const fromJson = board.players.filter((p) => namesMatch(p.school, teamName));
+      out.players = (fromJson.length ? fromJson : parsePlayerStrokeBoard(playerRes.text, teamName)).slice(0, 40);
+      const par = board.par || parseCoursePar(playerRes.text);
+      if (par) out.par = par;
     }
-    const par = parseCoursePar(playerRes.ok ? playerRes.text : teamRes.text);
-    if (par) out.par = par;
-    if (out.players?.length) out.status = "complete";
+    if (teamRes.ok) {
+      const board = parseClippdBoard(teamRes.text);
+      const teamRow = board.teams.find((t) => namesMatch(t.school, teamName));
+      if (teamRow) {
+        out.teamPlace = teamRow.finish;
+        out.teamRounds = teamRow.rounds;
+        out.teamTotal = teamRow.total;
+        out.teamToPar = teamRow.toPar;
+        out.teamThru = teamRow.thru;
+      }
+      if (!out.par && board.par) out.par = board.par;
+    }
+    if (out.players?.some((p) => p.thru) || out.teamThru) out.status = "live";
+    else if (out.players?.length) out.status = "complete";
   } catch (err) {
     out.error = String((err as Error).message || err);
   }
