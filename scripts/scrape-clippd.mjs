@@ -654,6 +654,12 @@ async function scrapeTournamentHttp(tournamentId, teamName) {
         } else if (!result.teamThru) {
           result.teamRounds = trimStrokeRounds(result.teamRounds, result.teamTotal);
         }
+        const played = (result.players || []).map((p) => (p.rounds || []).filter((r) => r != null).length);
+        const longest = played.length ? Math.max(...played) : (result.teamRounds || []).filter((r) => r != null).length;
+        const stillOut = Boolean(result.teamThru) || (result.players || []).some((p) => p.thru);
+        if (!stillOut && result.roundsPlanned && longest >= result.roundsPlanned && (result.players || []).length) {
+          result.status = "complete";
+        }
       }
     } catch {
       /* optional */
@@ -791,6 +797,20 @@ async function scrapeSchedulePlaywright(page, team) {
   };
 }
 
+function cardScore(t) {
+  const players = t?.players || [];
+  const playerRounds = players.reduce((max, p) => {
+    const n = (p.rounds || []).filter((r) => r != null).length;
+    return Math.max(max, n);
+  }, 0);
+  const teamRounds = (t?.teamRounds || []).filter((r) => r != null).length;
+  return {
+    players: players.length,
+    rounds: Math.max(playerRounds, teamRounds),
+    partial: Boolean(t?.teamThru) || players.some((p) => p.thru),
+  };
+}
+
 function keepBetter(prev, scraped) {
   if (!prev) return scraped;
   const prevById = new Map(
@@ -806,6 +826,15 @@ function keepBetter(prev, scraped) {
         old.teamPlace ||
         old.teamTotal != null);
     if (!newHas && oldHas) return { ...old, lastEmptyAt: scraped.scrapedAt };
+    if (oldHas) {
+      const a = cardScore(old);
+      const b = cardScore(t);
+      // Don't replace a finished lineup with a shorter or still-in-progress card.
+      const oldFuller =
+        a.players > b.players || (a.rounds > b.rounds && a.players >= b.players);
+      if (oldFuller && !a.partial) return old;
+      if (a.partial && !b.partial && b.players >= a.players) return t;
+    }
     return t;
   });
   for (const [id, old] of prevById) {

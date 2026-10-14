@@ -12,13 +12,11 @@ function unescapeFlight(html) {
     .replace(/\\u0027/g, "'");
 }
 
-function sliceObject(text, keyIdx) {
-  const start = text.lastIndexOf("{", keyIdx);
-  if (start < 0) return null;
+function sliceForward(text, start) {
   let depth = 0;
   let inStr = false;
   let esc = false;
-  for (let i = start; i < text.length && i < start + 80000; i += 1) {
+  for (let i = start; i < text.length && i < start + 100000; i += 1) {
     const c = text[i];
     if (inStr) {
       if (esc) esc = false;
@@ -36,25 +34,60 @@ function sliceObject(text, keyIdx) {
   return null;
 }
 
-function extractByKey(text, key) {
-  const needle = `"${key}":`;
-  const out = [];
-  const seen = new Set();
-  let i = 0;
-  while ((i = text.indexOf(needle, i)) !== -1) {
-    const raw = sliceObject(text, i);
-    i += needle.length;
-    if (!raw) continue;
-    const sig = `${raw.length}:${raw.slice(0, 48)}`;
-    if (seen.has(sig)) continue;
-    seen.add(sig);
-    try {
-      out.push(JSON.parse(raw));
-    } catch {
-      /* a nested fragment that isn't standalone JSON */
+function parseEnclosing(text, keyIdx, accept) {
+  let from = keyIdx;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const start = text.lastIndexOf("{", from);
+    if (start < 0) return null;
+    const raw = sliceForward(text, start);
+    if (raw && raw.length > keyIdx - start) {
+      try {
+        const obj = JSON.parse(raw);
+        if (accept(obj)) return obj;
+      } catch {
+        /* try the parent brace */
+      }
     }
+    from = start - 1;
   }
-  return out;
+  return null;
+}
+
+function extractLeaderboard(text) {
+  const players = [];
+  const teams = [];
+  let i = 0;
+  const playerKey = '"playerName":';
+  while ((i = text.indexOf(playerKey, i)) !== -1) {
+    const obj = parseEnclosing(
+      text,
+      i,
+      (o) =>
+        o.playerName &&
+        Array.isArray(o.strokes) &&
+        o.strokes.length > 0 &&
+        o.strokes.length <= 4,
+    );
+    i += playerKey.length;
+    if (obj) players.push(obj);
+  }
+  let j = 0;
+  const schoolKey = '"schoolName":';
+  while ((j = text.indexOf(schoolKey, j)) !== -1) {
+    const obj = parseEnclosing(
+      text,
+      j,
+      (o) =>
+        o.schoolName &&
+        !o.playerName &&
+        Array.isArray(o.strokes) &&
+        o.strokes.length > 0 &&
+        o.strokes.length <= 4,
+    );
+    j += schoolKey.length;
+    if (obj) teams.push(obj);
+  }
+  return { players, teams };
 }
 
 export function roundIsComplete(thru) {
@@ -89,6 +122,12 @@ function roundThru(obj) {
   return { rounds, thru };
 }
 
+function saneToPar(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || Math.abs(n) > 80) return null;
+  return n;
+}
+
 function coursePar(text) {
   const m = text.match(/"totalPar":(6[7-9]|7[0-5])(?!\d)/);
   return m ? Number(m[1]) : null;
@@ -96,20 +135,18 @@ function coursePar(text) {
 
 export function parseClippdBoard(html) {
   const text = unescapeFlight(html);
-  const objects = extractByKey(text, "strokes");
-  const playerObjs = [];
-  const teamObjs = [];
-  for (const obj of objects) {
-    if (!Array.isArray(obj.strokes) || obj.strokes.length === 0 || obj.strokes.length > 4) continue;
-    if (obj.playerName && obj.schoolName) playerObjs.push(obj);
-    else if (obj.schoolName && !obj.playerName) teamObjs.push(obj);
-  }
+  const { players: playerObjs, teams: teamObjs } = extractLeaderboard(text);
 
   const playersById = new Map();
+  const completeness = (obj) => {
+    const rounds = Array.isArray(obj.rounds) ? obj.rounds : [];
+    const done = rounds.filter((r) => roundIsComplete(r?.thru)).length;
+    return (obj.strokes?.length || 0) * 10 + done;
+  };
   for (const obj of playerObjs) {
     const id = String(obj.playerId || obj.playerName);
     const prev = playersById.get(id);
-    if (!prev || (obj.strokes?.length || 0) >= (prev.strokes?.length || 0)) playersById.set(id, obj);
+    if (!prev || completeness(obj) >= completeness(prev)) playersById.set(id, obj);
   }
   const uniquePlayers = [...playersById.values()];
   const playerRanks = uniquePlayers.map((p) => p.currentRank);
@@ -122,7 +159,7 @@ export function parseClippdBoard(html) {
       rounds,
       thru,
       total: Number.isFinite(Number(obj.totalStrokes)) ? Number(obj.totalStrokes) : null,
-      toPar: Number.isFinite(Number(obj.totalScore)) ? Number(obj.totalScore) : null,
+      toPar: saneToPar(obj.totalScore),
       finish: placeOf(obj.currentRank, playerRanks),
     };
   });
@@ -141,7 +178,7 @@ export function parseClippdBoard(html) {
       rounds,
       thru,
       total: Number.isFinite(Number(obj.totalStrokes)) ? Number(obj.totalStrokes) : null,
-      toPar: Number.isFinite(Number(obj.totalScore)) ? Number(obj.totalScore) : null,
+      toPar: saneToPar(obj.totalScore),
       finish: placeOf(obj.currentRank, teamRanks),
     };
   });
