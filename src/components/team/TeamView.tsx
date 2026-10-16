@@ -6,6 +6,8 @@ import {
   Star,
   Info,
   ChevronDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import {
   Bar,
@@ -33,6 +35,7 @@ import { SCRAPED_COMMITS } from "@/lib/commits";
 import { hydrateProgram } from "@/lib/watchlist";
 import { syncWatchlist } from "@/lib/pin-watchlist";
 import { useIntelStore } from "@/lib/store";
+import { teamRanking } from "@/lib/rankings";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -142,6 +145,8 @@ export function TeamView({ program: rawProgram }: { program: Program }) {
         </div>
       </header>
 
+      <RankingStrip program={program} />
+
       <section className="grid grid-cols-2 gap-2 lg:grid-cols-4">
         <Kpi label="Theoretical 2027 openings" value={forecast.theoretical} />
         <Kpi
@@ -181,6 +186,75 @@ export function TeamView({ program: rawProgram }: { program: Program }) {
       {tab === "selection" ? <Selection program={program} metrics={metrics} /> : null}
       {tab === "forecast" ? <Forecast program={program} metrics={metrics} /> : null}
     </div>
+  );
+}
+
+function RankingStrip({ program }: { program: Program }) {
+  const ranking = teamRanking(program);
+  if (!ranking) {
+    return (
+      <section className="rounded-xl bg-surface px-4 py-4 shadow-[var(--shadow-border)]">
+        <div className="text-[10px] uppercase tracking-[0.12em] text-subtle">
+          {program.div === "D3" ? "NCAA D3" : "NCAA D1"} men
+        </div>
+        <p className="mt-1 text-sm text-muted">Not on the current Clippd men’s ranking board.</p>
+      </section>
+    );
+  }
+  const up = ranking.delta != null && ranking.delta > 0;
+  const down = ranking.delta != null && ranking.delta < 0;
+  return (
+    <section className="flex flex-wrap items-end justify-between gap-4 rounded-xl bg-surface px-4 py-4 shadow-[var(--shadow-border)]">
+      <div>
+        <div className="text-[10px] uppercase tracking-[0.12em] text-subtle">
+          {ranking.divisionLabel} men · {ranking.currentSeason}
+        </div>
+        <div className="mt-1 flex items-baseline gap-3">
+          <a
+            href={ranking.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="font-display text-4xl font-medium tabular-nums tracking-tight text-fg hover:text-accent"
+          >
+            {ranking.current != null ? `#${ranking.current}` : "NR"}
+          </a>
+          {up || down ? (
+            <span
+              className={cn(
+                "inline-flex items-center gap-0.5 text-sm font-medium tabular-nums",
+                up ? "text-under" : "text-over",
+              )}
+            >
+              {up ? <ArrowUp className="size-4" /> : <ArrowDown className="size-4" />}
+              {Math.abs(ranking.delta || 0)}
+              <span className="ml-1 text-xs font-normal text-muted">
+                {up ? "up" : "down"} from last season
+              </span>
+            </span>
+          ) : ranking.delta === 0 ? (
+            <span className="text-sm text-muted">unchanged from last season</span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-xs text-muted">
+          {ranking.previous != null ? (
+            <>
+              {ranking.previousSeason}{" "}
+              <a
+                href={ranking.previousSourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="tabular-nums text-fg hover:text-accent"
+              >
+                #{ranking.previous}
+              </a>
+            </>
+          ) : (
+            <>Unranked in {ranking.previousSeason}</>
+          )}
+          {ranking.current == null ? " · not enough rounds this fall" : null}
+        </p>
+      </div>
+    </section>
   );
 }
 
