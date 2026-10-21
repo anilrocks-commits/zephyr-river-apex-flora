@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-10-20T11:13:56.215Z",
+  "scrapedAt": "2026-10-21T11:30:00.030Z",
   "classYear": 2027,
   "source": "collegegolfcommits.com + athletics news",
   "teams": {
@@ -125,7 +125,18 @@
     "fdu": {
       "id": "fdu",
       "name": "Fairleigh Dickinson",
-      "commits": []
+      "commits": [
+        {
+          "id": "fdu-c-jack-kessler",
+          "name": "Jack Kessler",
+          "classYear": 2027,
+          "hometown": "Mickleton NJ",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1fg",
+          "note": "Philadelphia Junior Golf Tour: one Top 5, six top 10s; Hurricane Junior Golf Tour- two top 10s"
+        }
+      ]
     },
     "umhb": {
       "id": "umhb",
@@ -142,10 +153,20 @@
       "name": "Carnegie Mellon",
       "commits": [
         {
+          "id": "cmu-c-jonah-fahrenbruch",
+          "name": "Jonah Fahrenbruch",
+          "classYear": 2027,
+          "hometown": "Dallas TX",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd3",
+          "note": ""
+        },
+        {
           "id": "cmu-c-ziqi-lang",
           "name": "Ziqi Lang",
           "classYear": 2027,
-          "hometown": "China",
+          "hometown": "China, Valencia CA",
           "status": "verbal",
           "source": "College Golf Commits",
           "sourceUrl": "https://collegegolfcommits.com/2027boysd3",
