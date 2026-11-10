@@ -1,12 +1,23 @@
 {
-  "scrapedAt": "2026-11-09T15:44:46.198Z",
+  "scrapedAt": "2026-11-10T14:39:40.546Z",
   "classYear": 2027,
   "source": "collegegolfcommits.com + athletics news",
   "teams": {
     "siu": {
       "id": "siu",
       "name": "Southern Illinois",
-      "commits": []
+      "commits": [
+        {
+          "id": "siu-c-nolan-eccles",
+          "name": "Nolan Eccles",
+          "classYear": 2027,
+          "hometown": "Peoria IL",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1s",
+          "note": "2025 2A IHSA state Champion; AJGA hosted by Renewal By Andersen and D.A. Points: 2nd; AJGA- Coca Cola Jr Championship at The Highlands: 3rd"
+        }
+      ]
     },
     "ksu": {
       "id": "ksu",
@@ -213,7 +224,18 @@
     "temple": {
       "id": "temple",
       "name": "Temple",
-      "commits": []
+      "commits": [
+        {
+          "id": "temple-c-lawson-ford",
+          "name": "Lawson Ford",
+          "classYear": 2027,
+          "hometown": "West Palm Beach,FL",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1tv",
+          "note": "One AJGA win &amp; one top-5 finish in 2025; One FJT top-5 &amp; one top-10 finish in 2025/2026"
+        }
+      ]
     },
     "eastern-michigan": {
       "id": "eastern-michigan",
