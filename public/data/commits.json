@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-10T14:39:40.546Z",
+  "scrapedAt": "2026-11-12T14:56:37.658Z",
   "classYear": 2027,
   "source": "collegegolfcommits.com + athletics news",
   "teams": {
@@ -234,6 +234,16 @@
           "source": "College Golf Commits",
           "sourceUrl": "https://collegegolfcommits.com/2027boysd1tv",
           "note": "One AJGA win &amp; one top-5 finish in 2025; One FJT top-5 &amp; one top-10 finish in 2025/2026"
+        },
+        {
+          "id": "temple-c-mateo-hidalgo",
+          "name": "Mateo Hidalgo",
+          "classYear": 2027,
+          "hometown": "Spain",
+          "status": "verbal",
+          "source": "College Golf Commits",
+          "sourceUrl": "https://collegegolfcommits.com/2027boysd1tv",
+          "note": "One win &amp; two top-5 finishes in Spain in 2026; Two wins &amp; three top-5 finishes in Spain in 2025"
         }
       ]
     },
