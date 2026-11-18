@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-17T15:46:17.665Z",
+  "scrapedAt": "2026-11-18T15:26:30.315Z",
   "classYear": 2027,
   "source": "collegegolfcommits.com + athletics news",
   "teams": {
@@ -80,6 +80,16 @@
       "id": "memphis",
       "name": "Memphis",
       "commits": [
+        {
+          "id": "memphis-c-blake-smart",
+          "name": "Blake Smart",
+          "classYear": 2027,
+          "hometown": "",
+          "status": "signed",
+          "source": "Athletics news",
+          "sourceUrl": "https://gotigersgo.com/news/2026/11/17/mens-golf-smart-adds-ishaan-shah-to-2027-roster",
+          "note": "Named on athletics signing/commit article."
+        },
         {
           "id": "memphis-c-eskil-torefors",
           "name": "Eskil Torefors",
